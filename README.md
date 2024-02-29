@@ -1,3 +1,12 @@
+# Frontend
+Repo containing the frontend
+
+# Build
+```bash
+vite build
+docker build -t vite-frontend .5
+```
+
 ## Prerequisites
 - **Node.js** version 14 or newer (should work)
 - **npm**
@@ -14,6 +23,4 @@ npm install
 ```
 
 To start the development server, run:
-```
-npm run dev
 ```
