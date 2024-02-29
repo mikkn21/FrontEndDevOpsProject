@@ -1,0 +1,34 @@
+.assignment-status {
+    font-weight: bold;
+}
+
+.assignment-status span:first-child {
+    font-size: x-large;
+}
+
+.error {
+    color: #ad2215; 
+}
+
+.not-submitted {
+    color: #ad2215; 
+}
+
+.submitted {
+    color:#9A9F78;
+}
+
+.status-icon {
+    font-size: 1.5em; 
+    margin-left: 0.5em; 
+}
+
+.status-icon.success {
+    color: green;
+}
+
+.status-icon.error {
+    color: red;
+}
+
+
