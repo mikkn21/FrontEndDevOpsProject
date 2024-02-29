@@ -3,7 +3,7 @@ Repo containing the frontend
 
 # Build
 ```bash
-vite build
+npm run build
 docker build -t vite-frontend .5
 ```
 
