@@ -3,11 +3,10 @@ import axios from 'axios';
 import './Button.css';
 
 interface FileUploadButtonProps {
-    endpoint: string; // URL of the API endpoint
     onFileUploadStatus: (status: string, fileRef: string) => void;
 }
 
-const FileUploadButton: React.FC<FileUploadButtonProps> = ({ endpoint, onFileUploadStatus }) => {
+const FileUploadButton: React.FC<FileUploadButtonProps> = ({onFileUploadStatus }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleButtonClick = () => {
@@ -19,6 +18,8 @@ const FileUploadButton: React.FC<FileUploadButtonProps> = ({ endpoint, onFileUpl
         if (files && files[0]) {
             const formData = new FormData();
             formData.append('file', files[0]);
+            
+            const endpoint="/api/API_ENDPOINT_HERE"
 
             axios.post(endpoint, formData, {
                 headers: {

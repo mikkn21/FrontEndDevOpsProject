@@ -36,10 +36,7 @@ const App: React.FC = () => {
         <AssignmentStatus status={status} evaluationStatus={evaluationStatus} />
         </div>
         <div className='panel'>
-         <FileUploadButton
-             endpoint="YOUR_API_ENDPOINT_HERE"
-             onFileUploadStatus={handleFileUpload}
-             />
+         <FileUploadButton onFileUploadStatus={handleFileUpload}/>
           {fileReference && <SubmitButton
             fileReference={fileReference}
             onDataSubmit={handleDataSubmit} // We don't show the submit button unless we know a file was sucesfully submitted.

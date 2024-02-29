@@ -5,6 +5,9 @@
 
 ## Get started
 
+This is buildt using Vite on top of React + TS. 
+
+
 Install the necessary dependencies:
 ```bash
 npm install

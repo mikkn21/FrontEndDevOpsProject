@@ -24,8 +24,9 @@
 
 
 .panel {
-    display: flex;
-    justify-content: center;
-    gap: 20px; 
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  justify-content: center;
+  gap: 20px; 
   }
 

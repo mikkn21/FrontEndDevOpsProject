@@ -9,7 +9,7 @@ interface SubmitButtonProps {
 
 const SubmitButton: React.FC<SubmitButtonProps> = ({ fileReference, onDataSubmit }) => {
     const handleEvaluation = () => {
-        const evaluationEndpoint = `EVALUATION_SERVICE_ENDPOINT/${fileReference}`;
+        const evaluationEndpoint = `/api/EVALUATION_SERVICE_ENDPOINT/${fileReference}`;
 
          axios.post(evaluationEndpoint, { /* If we need to send additional data */ })
             .then(response => {
