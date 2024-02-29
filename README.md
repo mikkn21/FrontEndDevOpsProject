@@ -10,6 +10,7 @@ Repo containing the frontend
 npm install
 npm run build
 docker build -t vite-frontend .
+docker run -p 3000:8080 vite-frontend
 ```
 
 Now access the frontend application at localhost:8080
