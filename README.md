@@ -11,10 +11,10 @@ docker build -t vite-frontend .5
 - **Node.js** version 14 or newer (should work)
 - **npm**
 
-
 ## Get started
 
 This is buildt using Vite on top of React + TS. 
+For Http request axios is used
 
 
 Install the necessary dependencies:
@@ -23,4 +23,6 @@ npm install
 ```
 
 To start the development server, run:
+```bash
+npm run dev
 ```
