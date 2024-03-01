@@ -13,7 +13,7 @@ docker build -t vite-frontend .
 docker run -p 3000:8080 vite-frontend
 ```
 
-Now access the frontend application at localhost:8080
+Now access the frontend application at localhost:3000
 
 # Local development
 

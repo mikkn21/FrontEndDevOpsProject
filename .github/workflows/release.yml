@@ -1,0 +1,79 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - DISABLED
+
+env:
+  GITHUB_REGISTRY: ghcr.io
+  GITHUB_REGISTRY_USERNAME: ${{ github.actor }}
+  GITHUB_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+  IMAGE_NAME: devops-project-sdu/frontend
+
+jobs:
+  version-and-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: bump tag
+        id: bump-tag
+        uses: anothrNick/github-tag-action@1.36.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: false
+
+    outputs:
+      tag: ${{ steps.bump-tag.outputs.tag }}
+
+  release:
+    needs: version-and-tag
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: npm install
+      - name: Run build
+        run: npm run build
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.GITHUB_REGISTRY }}
+          username: ${{ env.GITHUB_REGISTRY_USERNAME }}
+          password: ${{ env.GITHUB_REGISTRY_PASSWORD }}
+
+      - name: Build docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          load: true
+          build-args: VERSION=v${{ needs.version-and-tag.outputs.tag }}
+          tags: ${{ needs.version-and-tag.outputs.tag }}
+
+      - name: Run trivy scan
+        uses: Devops-project-SDU/.github/actions/trivy-scan@main
+        with:
+          image-tag: ${{ needs.version-and-tag.outputs.tag }}
+
+      - name: Push docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.GITHUB_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.version-and-tag.outputs.tag }}
+            ${{ env.GITHUB_REGISTRY }}/${{ env.IMAGE_NAME }}:latest
