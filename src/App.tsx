@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import FileUploadButton from './components/Button/FileUploadButton'; 
 import SubmitButton from './components/Button/SubmitButton'; 
+import ProtectedRoute from './components/ProtectedRoute/protectedRoute';
 import AssignmentStatus from './components/AssignmentStatus/AssignmentStatus';
-
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import LoginPage from './pages/login'; 
 
 import './App.css'; 
 
 const App: React.FC = () => {
   useEffect(() => {
-    document.title = "WIP title"; 
+    document.title = "Better Learning"; 
   }, []);
 
   const [fileReference, setFileReference] = useState<string | null>(null);
@@ -27,23 +29,35 @@ const App: React.FC = () => {
 
 
   return (
-    <div>
-      <div className='container'>
-        <h1>Hello, world!</h1>
-      </div>   
-      <div className='ui'>
-        <div>
-        <AssignmentStatus status={status} evaluationStatus={evaluationStatus} />
-        </div>
-        <div className='panel'>
-         <FileUploadButton onFileUploadStatus={handleFileUpload}/>
-          {fileReference && <SubmitButton
-            fileReference={fileReference}
-            onDataSubmit={handleDataSubmit} // We don't show the submit button unless we know a file was sucesfully submitted.
-          />}
-        </div>
-      </div>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* Login page route */}
+        <Route path="/login" element={<LoginPage />} />
+
+        {/* Main page route, which is protected i.e., you need to be logged in to view */}
+        <Route path="/" element={
+        <ProtectedRoute requireAdmin={false} element={
+          <div>
+            <div className='container'>
+              <h1>Hello, world!</h1>
+            </div>   
+            <div className='ui'>
+              <div>
+                <AssignmentStatus status={status} evaluationStatus={evaluationStatus} />
+              </div>
+              <div className='panel'>
+                <FileUploadButton onFileUploadStatus={handleFileUpload}/>
+                {fileReference && <SubmitButton
+                  fileReference={fileReference}
+                  onDataSubmit={handleDataSubmit}
+                />}
+              </div>
+            </div>
+          </div>
+        }/>
+      }/>
+      </Routes>
+    </BrowserRouter>
   );
 };
 
