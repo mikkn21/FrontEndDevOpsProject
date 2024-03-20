@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './login.css';
+import Cookies from 'js-cookie';
 import Button from '../components/Button/Button';
 import Slideshow from '../components/SlideShow/slideShow';
+import HashPass from '../components/HashPass/passwordHash'
 
 const LoginPage: React.FC = () => {
     const [username, setUsername] = useState('');
@@ -14,8 +16,7 @@ const LoginPage: React.FC = () => {
     const handleLoginClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         setError(''); 
-
-
+                
         // hacky ADMIN login
         if (username === 'ADMIN' && password === 'ADMIN') {
             // We can store some flag in localStorage if needed, or handle admin session
@@ -24,30 +25,36 @@ const LoginPage: React.FC = () => {
             return; 
         }
 
-        const endpoint="/api/API_ENDPOINT_HERE"
+        const endpoint="/api/authentication"
+
+        // Get the hashed password to send to the backend
+        const hashedPassword = await HashPass(password);
 
         try {
             const response = await axios.post(endpoint, {
                 username,
-                password
+                hashedPassword
             });
             
-            // If the login is successful, you might receive a token or a success message
-            if (response.status === 200) {
-                // Perform any success actions like storing the token
-                // localStorage.setItem('token', response.data.token);
-
+            if (response.status === 200 && response.data.token) {
+                Cookies.set('token', response.data.token, { expires: 7, secure: true, sameSite: 'strict' });
                 navigate('/');
             }
         } catch (error) {
-            console.log("error");
-            // Handle errors here, like incorrect username or password
-            if (axios.isAxiosError(error) && error.response) {
-                // The server responded with a status code outside the range of 2xx
-                setError('Username or password is incorrect');
+            if (axios.isAxiosError(error)) {
+                const status = error.response?.status;
+                if (status === 400) {
+                    // Handle Bad Request
+                    setError('try again something went wrong');
+                } else if (status === 404) {
+                    // Handle Not Found
+                    setError('invalid username or password');
+                } else {
+                    setError('An error occurred. Please try again later.');
+                }
             } else {
-                // An error occurred in setting up the request
-                setError('An error occurred. Please try again later.');
+                // Handle non-Axios errors
+                setError('An unexpected error occurred. Please try again later.');
             }
         }
     };
