@@ -3,9 +3,9 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './login.css';
 import Cookies from 'js-cookie';
-import Button from '../components/Button/Button';
-import Slideshow from '../components/SlideShow/slideShow';
-import HashPass from '../components/HashPass/passwordHash'
+import Button from '../../components/Button/Button';
+import Slideshow from '../../components/SlideShow/slideShow';
+import HashPass from '../../components/HashPass/passwordHash'
 
 const LoginPage: React.FC = () => {
     const [username, setUsername] = useState('');
@@ -17,10 +17,10 @@ const LoginPage: React.FC = () => {
         event.preventDefault();
         setError(''); 
                 
-        // hacky ADMIN login
-        if (username === 'ADMIN' && password === 'ADMIN') {
-            // We can store some flag in localStorage if needed, or handle admin session
-            localStorage.setItem('isAdmin', 'true');
+        // ADMIN login that can be used to bypass the authentication
+        if (username == 'ADMIN' && password == 'ADMIN') {
+            const adminTokenValue = `adminToken|${username}`;
+            Cookies.set('adminToken', adminTokenValue, { expires: 1, secure: true, sameSite: 'strict' });
             navigate('/');
             return; 
         }
@@ -37,7 +37,7 @@ const LoginPage: React.FC = () => {
             });
             
             if (response.status === 200 && response.data.token) {
-                Cookies.set('token', response.data.token, { expires: 7, secure: true, sameSite: 'strict' });
+                Cookies.set('token', response.data.token, { expires: 1, secure: true, sameSite: 'strict' });
                 navigate('/');
             }
         } catch (error) {

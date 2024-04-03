@@ -4,7 +4,10 @@ import SubmitButton from './components/Button/SubmitButton';
 import ProtectedRoute from './components/ProtectedRoute/protectedRoute';
 import AssignmentStatus from './components/AssignmentStatus/AssignmentStatus';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import LoginPage from './pages/login'; 
+import LoginPage from './pages/login/login'; 
+import Navbar from './components/NavBar/navBar';
+import Page1 from './pages/page1/page1'; 
+import Page2 from './pages/Page2/page2';
 
 import './App.css'; 
 
@@ -37,7 +40,9 @@ const App: React.FC = () => {
         {/* Main page route, which is protected i.e., you need to be logged in to view */}
         <Route path="/" element={
         <ProtectedRoute requireAdmin={false} element={
+          /* Main page might need to be its own page also */
           <div>
+            <Navbar />
             <div className='container'>
               <h1>Hello, world!</h1>
             </div>   
@@ -55,6 +60,12 @@ const App: React.FC = () => {
             </div>
           </div>
         }/>
+      }/>
+      <Route path="/p1" element= {
+        <ProtectedRoute requireAdmin={false} element={<Page1 />}/>
+      }/>
+       <Route path="/p2" element= {
+        <ProtectedRoute requireAdmin={false} element={<Page2 />}/>
       }/>
       </Routes>
     </BrowserRouter>

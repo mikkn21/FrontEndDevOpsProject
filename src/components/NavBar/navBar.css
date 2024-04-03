@@ -1,0 +1,101 @@
+.navbar {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    background-color: #8C7C63;
+    justify-content: space-between;
+    padding: 10px 0;
+    position: relative;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+
+p {
+    color: white;
+}
+
+.username-container {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .dropdown-icon {
+    color: white;
+    margin-left: 2px; 
+    display: inline-block;
+    transition: transform 0.3s ease, text-shadow 0.3s ease;
+    text-shadow: 0px 0px 8px rgba(0, 0, 0, 0.5); 
+  }
+  
+  .dropdown:hover .dropdown-icon {
+    transform: rotate(180deg); 
+
+  }
+
+
+.dropdown {
+    padding-right:10px ;
+    display: relative;
+    margin-left: auto;
+    float: left;
+    overflow: hidden;
+  }
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    color: inherit;
+    min-width: 100px;
+    z-index: 1;
+}
+
+.dropdown .dropdown-content .btn {
+    font-size: 13px;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+
+
+.menu {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 10px;
+}
+
+.nav-item {
+    color: #E7DCC9; 
+    text-decoration: none;
+    padding: 10px;
+    transition: color 0.3s; 
+}
+
+.nav-item:hover {
+    color: white; 
+}
+
+.nav-item.active {
+    color: white; 
+    position: relative;
+}
+
+.nav-item.active::after {
+    content: '';
+    position: absolute;
+    left: 50%; 
+    bottom: 0; 
+    width: 50%;
+    height: 3px;
+    background-color: white; 
+    border-radius: 1.5px;
+    z-index: 1;
+    transform: translateX(-50%); 
+}
+
+.navbar-logo img {
+    padding-left: 10px;
+}

@@ -1,18 +1,21 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
+import React from 'react';
+import { Navigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 interface ProtectedRouteProps {
-  requireAdmin?: boolean; // allows us to specify whether a page is only for admins
+  requireAdmin?: boolean;
   element: React.ReactElement;
 }
 
-const ProtectedRoute = ({ element }: ProtectedRouteProps) => {
-  const isAuthenticated = false; // Replace with actual authentication logic
-  const isAdmin = localStorage.getItem("isAdmin") === "true";
-
-  // If not authenticated or not ADMIN send to login screen
-  if (!isAuthenticated && !isAdmin) {
-    return <Navigate to="/login" replace />; // Redirect to login with 'replace' for history
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requireAdmin, element }) => {
+  const isAuthenticated = !!Cookies.get('token');
+  const isAdmin = !!Cookies.get('adminToken'); // Check for admin token
+  
+  if (requireAdmin && !isAdmin) {
+    return <Navigate to="/login" replace />;
+  } else if (!isAuthenticated && !isAdmin) {
+    // Allow admins to access without the regular auth token
+    return <Navigate to="/login" replace />;
   }
 
   return element;
