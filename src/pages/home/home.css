@@ -1,0 +1,18 @@
+h1 {
+    text-decoration: underline;
+  }
+  
+  .ui {
+    display: flex; 
+    flex-direction: column;
+    row-gap: 30px;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  
+  .container {
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+  }
