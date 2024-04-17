@@ -4,11 +4,12 @@ import Navbar from '../../components/NavBar/navBar';
 import AssignmentStatus from '../../components/AssignmentStatus/AssignmentStatus';
 import FileUploadButton from '../../components/Button/FileUploadButton';
 import SubmitButton from '../../components/Button/SubmitButton';
+import AssignmentCell from '../../components/AssignmentCell/assignmentCell';
 
 
 const home: React.FC = () => {
 
-    const [fileReference, setFileReference] = useState<string | null>(null);
+    const [file, setFile] = useState<File | null>(null);
     const [status, setStatus] = useState('NOT SUBMITTED'); 
     const [evaluationStatus, setEvaluationStatus] = useState<null | 'SUCCESS' | 'ERROR'>(null);
 
@@ -17,9 +18,9 @@ const home: React.FC = () => {
         setEvaluationStatus(result);
     };
 
-    const handleFileUpload = (newStatus: string, fileRef: string) => {
+    const handleFileUpload = (newStatus: string, uploadedFile: File) => {
         setStatus(newStatus);
-        setFileReference(fileRef); // store file ID or token given from the Microservice to send to the Submit button
+        setFile(uploadedFile); // store file ID or token given from the Microservice to send to the Submit button
     };
 
 
@@ -35,11 +36,17 @@ const home: React.FC = () => {
           </div>
           <div className='panel'>
             <FileUploadButton onFileUploadStatus={handleFileUpload}/>
-            {fileReference && <SubmitButton
-              fileReference={fileReference}
-              onDataSubmit={handleDataSubmit}
-            />}
+            {file && <SubmitButton
+              fileReference={file.name}
+              onDataSubmit={handleDataSubmit} 
+              disabled={false}            
+              />}
           </div>
+        </div>
+        {/* test section */}
+        <hr style={{width:"100%", backgroundColor:"red", height:"5px", border: 'none'}}/>
+        <div className = 'container'>
+              <AssignmentCell AssignmentName={''}></AssignmentCell>
         </div>
       </div>
     );

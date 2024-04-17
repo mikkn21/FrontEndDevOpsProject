@@ -4,8 +4,8 @@ import './assignmentTable.css';
 
 const AssignmentTable: React.FC = () => {
     return (
-        <div>
-
+        <div className = 'table'>
+            
 
         </div>
     );

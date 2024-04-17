@@ -3,42 +3,64 @@ import './assignmentCell.css';
 import AssignmentStatus from '../AssignmentStatus/AssignmentStatus';
 import FileUploadButton from '../Button/FileUploadButton';
 import SubmitButton from '../Button/SubmitButton';
-
+import fileIcon from '../../assets/icons8-file.svg'
 
 interface AssignmentCellProps {
-    AssignmentName: string; 
+    AssignmentName?: string | null; 
 }
 
-const AssignmentCell: React.FC<AssignmentCellProps> = ({AssignmentName = "Default assignment name"}) => {
-    const [fileReference, setFileReference] = useState<string | null>(null);
+const AssignmentCell: React.FC<AssignmentCellProps> = (props) => {
+
+    const {AssignmentName} = props; 
+    const effectiveAssignmentName = AssignmentName || "Default assignment name";
+
+    const [file, setFile] = useState<File | null>(null);
     const [status, setStatus] = useState('NOT SUBMITTED'); 
     const [evaluationStatus, setEvaluationStatus] = useState<null | 'SUCCESS' | 'ERROR'>(null);
   
     const handleDataSubmit = (result: 'SUCCESS' | 'ERROR') => {
       setEvaluationStatus(result);
+      if (result === 'SUCCESS') {
+        setStatus('SUBMITTED');
+      } else {
+        setStatus('ERROR');
+      }
     };
   
-    const handleFileUpload = (newStatus: string, fileRef: string) => {
+    const handleFileUpload = (newStatus: string, uploadedFile: File) => {
       setStatus(newStatus);
-      setFileReference(fileRef); // store file ID or token given from the Microservice to send to the Submit button
+      setFile(uploadedFile);
     };
 
-
+    const handleFileRemove = () => {
+      setFile(null);
+      setStatus('NOT SUBMITTED');
+      setEvaluationStatus(null);
+    };
 
     return (
-        <div className='cell'>
-        <h3>{AssignmentName}</h3>
-        <AssignmentStatus status={status} evaluationStatus={evaluationStatus} />
-        <div>
-          {fileReference ? <p>File uploaded: {fileReference}</p> : <p>No file uploaded</p>}
+      <div className='cell'>
+          <h2>{effectiveAssignmentName}</h2>
+          <AssignmentStatus status={status} evaluationStatus={evaluationStatus} />
+          <div className ='file-info'> 
+            {file ? (
+              <>
+                <img src={fileIcon} alt="file type" className="file-icon" />
+                <p>{file.name}</p>
+                <div className='remove-file' onClick={handleFileRemove}>&times;</div>
+              </>
+            ) : null}
+          </div>
+        <div className='buttons-container'>
+          <FileUploadButton onFileUploadStatus={handleFileUpload} />
+          <SubmitButton
+            fileReference={file ? file.name : ""}  // Ensure a string is always passed
+            onDataSubmit={handleDataSubmit}
+            disabled={!file}
+          />
         </div>
-        <FileUploadButton onFileUploadStatus={handleFileUpload} />
-        {fileReference && <SubmitButton
-          fileReference={fileReference}
-          onDataSubmit={handleDataSubmit}
-        />}
       </div>
-    );
+  );
 }
 
-export default AssignmentCell; 
+export default AssignmentCell;

@@ -3,7 +3,7 @@
 }
 
 .assignment-status span:first-child {
-    font-size: x-large;
+    font-size: large;
 }
 
 .error {
@@ -11,7 +11,7 @@
 }
 
 .not-submitted {
-    color: #ad2215; 
+    color: #8f908e;
 }
 
 .submitted {
@@ -25,10 +25,16 @@
 
 .status-icon.success {
     color: green;
+    margin: 0 0;
+    font-size: 1.2em;
+    vertical-align: middle;
 }
 
 .status-icon.error {
     color: red;
+    margin: 0 0;
+    font-size: 1.2em;
+    vertical-align: middle;
 }
 
 
