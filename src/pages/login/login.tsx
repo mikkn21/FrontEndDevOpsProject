@@ -20,6 +20,7 @@ const LoginPage: React.FC = () => {
         // ADMIN login that can be used to bypass the authentication
         if (username == 'ADMIN' && password == 'ADMIN') {
             const adminTokenValue = `adminToken|${username}`;
+            // secure: true requires HTTPS!!
             Cookies.set('adminToken', adminTokenValue, { expires: 1, secure: true, sameSite: 'strict' });
             navigate('/');
             return; 

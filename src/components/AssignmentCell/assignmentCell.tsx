@@ -7,6 +7,7 @@ import fileIcon from '../../assets/icons8-file.svg'
 
 interface AssignmentCellProps {
     AssignmentName?: string | null; 
+    dueDate?: string | null;
 }
 
 const AssignmentCell: React.FC<AssignmentCellProps> = (props) => {
@@ -41,7 +42,10 @@ const AssignmentCell: React.FC<AssignmentCellProps> = (props) => {
     return (
       <div className='cell'>
           <h2>{effectiveAssignmentName}</h2>
-          <AssignmentStatus status={status} evaluationStatus={evaluationStatus} />
+          <div className='left-align'>
+            <AssignmentStatus status={status} evaluationStatus={evaluationStatus} />
+            <p>Due date: {props.dueDate || 'No due date'}</p>
+          </div>
           <div className ='file-info'> 
             {file ? (
               <>
@@ -57,6 +61,7 @@ const AssignmentCell: React.FC<AssignmentCellProps> = (props) => {
             fileReference={file ? file.name : ""}  // Ensure a string is always passed
             onDataSubmit={handleDataSubmit}
             disabled={!file}
+            testMode={true}
           />
         </div>
       </div>

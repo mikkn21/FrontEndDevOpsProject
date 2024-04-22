@@ -8,33 +8,45 @@
 
 .error {
     color: #ad2215; 
+    margin: 0 0;
+    margin-left: 0.2em;
+}
+
+.uploaded {
+    color: #8f908e;
+    margin: 0 0;
+    margin-left: 0.2em;
+
 }
 
 .not-submitted {
     color: #8f908e;
+    margin: 0 0;
+    margin-left: 0.2em;
 }
 
 .submitted {
     color:#9A9F78;
+    margin: 0 0;
+    margin-left: 0.2em;
 }
 
 .status-icon {
     font-size: 1.5em; 
-    margin-left: 0.5em; 
+    margin: 0 0;
+    margin-left: 0.2em; 
+    display: inline-block; 
+    line-height: 1;
+    vertical-align: middle;
 }
 
 .status-icon.success {
-    color: green;
-    margin: 0 0;
-    font-size: 1.2em;
-    vertical-align: middle;
+    color:#9A9F78;
+    
 }
 
 .status-icon.error {
-    color: red;
-    margin: 0 0;
-    font-size: 1.2em;
-    vertical-align: middle;
+    color: #ad2215; 
 }
 
 

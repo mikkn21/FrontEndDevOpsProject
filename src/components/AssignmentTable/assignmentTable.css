@@ -1,0 +1,38 @@
+.table {
+    border: 2px solid #ddd;
+    border-radius: 4px;
+}
+
+.table-header {
+    margin-top: 4em;
+    background-color: #f4f4f4;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: left;
+}
+
+.table-header h1 {
+    margin-bottom: 0.4em;
+}
+
+
+.assignment-table-header .btn {
+    padding: 0.5em 1em; /* Adjust padding to make the button smaller */
+    font-size: 0.8rem; /* Adjust font size to make text smaller */
+    margin: 0.2em; 
+  }
+
+.pagination {
+    display: flex;
+    justify-content: left;
+    gap: 0.3em;
+}
+ 
+.cell {
+    margin-top: 1.2em;
+    margin-bottom: 1.2em;
+}
+
+  

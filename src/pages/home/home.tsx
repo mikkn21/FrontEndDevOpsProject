@@ -5,7 +5,7 @@ import AssignmentStatus from '../../components/AssignmentStatus/AssignmentStatus
 import FileUploadButton from '../../components/Button/FileUploadButton';
 import SubmitButton from '../../components/Button/SubmitButton';
 import AssignmentCell from '../../components/AssignmentCell/assignmentCell';
-
+import AssignmentTable from '../../components/AssignmentTable/assignmentTable';
 
 const home: React.FC = () => {
 
@@ -27,26 +27,8 @@ const home: React.FC = () => {
     return (
         <div>
         <Navbar />
-        <div className='container'>
-          <h1>Hello, world!</h1>
-        </div>   
-        <div className='ui'>
-          <div>
-            <AssignmentStatus status={status} evaluationStatus={evaluationStatus} />
-          </div>
-          <div className='panel'>
-            <FileUploadButton onFileUploadStatus={handleFileUpload}/>
-            {file && <SubmitButton
-              fileReference={file.name}
-              onDataSubmit={handleDataSubmit} 
-              disabled={false}            
-              />}
-          </div>
-        </div>
-        {/* test section */}
-        <hr style={{width:"100%", backgroundColor:"red", height:"5px", border: 'none'}}/>
         <div className = 'container'>
-              <AssignmentCell AssignmentName={''}></AssignmentCell>
+              <AssignmentTable testMode={true} />
         </div>
       </div>
     );

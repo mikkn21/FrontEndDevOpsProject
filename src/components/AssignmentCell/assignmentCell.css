@@ -1,8 +1,22 @@
+
+.left-align {
+  text-align: left;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.assignment-status {
+  margin: 10px 0;
+}
+
+
+
 .file-info {
   min-height: 50px;  
   display: flex;
   align-items: center;
-  justify-content: start;  
+  justify-content: center;  
   background: #f8f8f8; 
   margin: 10px 0;
   padding: 0 10px;  
@@ -36,9 +50,13 @@ p {
   font-weight: bold;
 }
 
+h2 {
+  text-align: center;
+}
+
 .buttons-container {
   display: flex;
-  justify-content: start;
+  justify-content: space-between;
   gap: 10px; 
 }
 

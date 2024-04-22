@@ -2,7 +2,7 @@ import React from 'react';
 import './AssignmentStatus.css'; 
 
 interface AssignmentStatusProps {
-    // Submitted or not-submitted
+    // Submitted or not-submitted or UPLOADED
     status: string; 
     evaluationStatus?: 'SUCCESS' | 'ERROR' | null;
 }
@@ -14,7 +14,7 @@ const AssignmentStatus: React.FC<AssignmentStatusProps> = ({ status, evaluationS
         <div className="assignment-status">
             <span>Submission status: </span>
             <span className={className}>{status}</span>
-            {evaluationStatus === 'SUCCESS' && <span className="status-icon succes">&#10003;</span>} {/* Green checkmark */}
+            {evaluationStatus === 'SUCCESS' && <span className="status-icon success">&#10003;</span>} {/* Green checkmark */}
             {evaluationStatus === 'ERROR' && <span className="status-icon error">&#10007;</span>} {/* Red X */}
         </div>
     );
