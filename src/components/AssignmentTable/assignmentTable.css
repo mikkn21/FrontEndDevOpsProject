@@ -1,20 +1,24 @@
 .table {
-    border: 2px solid #ddd;
+    border: 2px solid #5E4725;
+    margin-top: 4em;
     border-radius: 4px;
+    min-width: 500px;
 }
 
 .table-header {
-    margin-top: 4em;
-    background-color: #f4f4f4;
+    /* background-color: #f4f4f4; */
+    background-color: #C2C0A2;
     padding: 10px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: left;
+    border-bottom: 1px solid #5E4725;
 }
 
 .table-header h1 {
     margin-bottom: 0.4em;
+    align-self: center;
 }
 
 

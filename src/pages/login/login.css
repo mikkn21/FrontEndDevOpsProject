@@ -2,6 +2,12 @@ body {
     margin: 0;
     padding: 0;
   }
+
+.btn-row {
+    display: flex;
+    justify-content: space-between; 
+    margin-top: 10px; 
+}
   
   
   .login-container {

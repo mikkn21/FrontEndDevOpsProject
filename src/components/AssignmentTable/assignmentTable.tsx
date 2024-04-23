@@ -36,6 +36,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({ testMode = false }) =
                 { id: 3, name: 'Test Assignment 3', dueDate: '2024-05-03' },
                 { id: 4, name: 'Test Assignment 4', dueDate: '2024-05-04' },
                 { id: 5, name: 'Test Assignment 5', dueDate: '2024-05-05' },
+                { id: 6, name: 'Test Assignment 6', dueDate: '2023-05-05' },
             ];
             setAssignments(testAssignments);
             setLoading(false);
@@ -82,7 +83,8 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({ testMode = false }) =
 
     const showPast = () => {
         const now = new Date();
-        setFilteredAssignments(assignments.filter(a => new Date(a.dueDate) < now));
+        const pastAssignments = assignments.filter(a => new Date(a.dueDate) < now);
+        setFilteredAssignments(pastAssignments);
         setCurrentPage(0);
     };
 
@@ -110,17 +112,24 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({ testMode = false }) =
 
     return (
         <div>
-            <div className='table-header assignment-table-header'>
-                <h1>Assignments</h1>
-                <div>
-                    <Button onClick={showCurrent}>Current</Button>
-                    <Button onClick={showPast}>Past</Button>
-                </div>
-            </div>
             <div className='table'>
-                {pagedAssignments.map(assignment => (
-                    <AssignmentCell key={assignment.id} AssignmentName={assignment.name} dueDate={assignment.dueDate} />
-                ))}
+                <div className='table-header assignment-table-header'>
+                    <h1>Assignments</h1>
+                    <div>
+                        <Button onClick={showCurrent}>Current</Button>
+                        <Button onClick={showPast}>Past</Button>
+                    </div>
+                </div>
+                <div >
+                    {pagedAssignments.map(assignment => (
+                        <AssignmentCell 
+                            key={assignment.id} 
+                            AssignmentName={assignment.name} 
+                            dueDate={assignment.dueDate}
+                            isPast={new Date(assignment.dueDate) < new Date()} 
+                         />
+                    ))}
+                </div>
             </div>
             <div className='pagination'>
                 <button onClick={previousPage} disabled={currentPage <= 0}>Previous</button>

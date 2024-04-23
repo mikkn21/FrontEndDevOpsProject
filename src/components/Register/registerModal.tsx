@@ -1,51 +1,34 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import './registerModal.css'
+import Button from "../Button/Button";
 import axios from "axios";
+import Cookies from "js-cookie"
 import { useNavigate } from "react-router-dom";
-import "./login.css";
-import Cookies from "js-cookie";
-import Button from "../../components/Button/Button";
-import Slideshow from "../../components/SlideShow/slideShow";
 import HashPass from "../../components/HashPass/passwordHash";
-import RegisterModal from "../../components/Register/registerModal";
 
+interface RegisterModalProps {
+  onClose: () => void;
+}
 
-const LoginPage: React.FC = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+const RegisterModal: React.FC<RegisterModalProps> = ({ onClose }) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const [showRegisterModal, setShowRegisterModal] = useState(false);
 
-  const handleShowRegisterModal = () => setShowRegisterModal(true);
-  const handleHideRegisterModal = () => setShowRegisterModal(false);
-
-
-
-  const handleLoginClick = async (
-    event: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    event.preventDefault();
-    console.log("Login clicked");
+  const handleRegistration = async () => {
+    // Implement registration logic here
+    // For example, API call to thebackend to create a new user
+    console.log("Registering", { username, password});
     setError("");
 
-    // ADMIN login that can be used to bypass the authentication
-    if (username == "ADMIN" && password == "ADMIN") {
-      const adminTokenValue = `adminToken|${username}`;
-      Cookies.set("adminToken", adminTokenValue, {
-        expires: 1,
-        secure: true,
-        sameSite: "strict",
-      });
-      navigate("/");
-      return;
-    }
-
-    const endpoint = "/login/authentication";
+    const endpoint = "/api/register";
 
     // Get the hashed password to send to the backend
     const hashedPassword = await HashPass(password);
-
+    
     try {
+      console.log("BEFORE ERROR");
       const response = await axios.post(endpoint, {
         username,
         hashedPassword,
@@ -59,10 +42,12 @@ const LoginPage: React.FC = () => {
           secure: true,
           sameSite: "strict",
         });
+        // Close the modal upon successful registration
+        onClose();
         navigate("/");
       }
     } catch (error) {
-      console.log("hello");
+      console.log("OTHER STUFF");
       if (axios.isAxiosError(error)) {
         const status = error.response?.status;
         if (status === 400) {
@@ -76,18 +61,17 @@ const LoginPage: React.FC = () => {
         }
       } else {
         // Handle non-Axios errors
-        console.log("Non-Axios error:", error);
+        console.log("ERROR HERE");
         setError("An unexpected error occurred. Please try again later.");
       }
-    }
+    } 
   };
 
   return (
-    <div className="login-container">
-      <Slideshow />
-      <div className="login-box">
-        <h1>Welcome to Better Learning</h1>
-        <div className="login-form">
+    <div className="modal-overlay">
+      <div className="modal">
+        <h2>Register as a student</h2>
+        <form onSubmit={(e) => { e.preventDefault(); handleRegistration(); }}>
           <input
             type="text"
             placeholder="Username"
@@ -100,18 +84,17 @@ const LoginPage: React.FC = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <div className='btn-row'>
-            <Button onClick={handleLoginClick}>Login</Button>
-            <Button onClick={handleShowRegisterModal}>Create User</Button>
-            {showRegisterModal && (
-              <RegisterModal onClose={handleHideRegisterModal} />
-            )}
+          <div className="modal-buttons">
+            <Button type="submit">Register</Button>
+            <Button onClick={onClose}>Cancel</Button>
           </div>
-          {error && <div className="error">{error}</div>}
-        </div>
+        </form>
+        {error && <div className="error">{error}</div>}
       </div>
     </div>
   );
 };
 
-export default LoginPage;
+export default RegisterModal;
+
+

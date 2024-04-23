@@ -4,9 +4,10 @@ import './Button.css';
 
 interface FileUploadButtonProps {
     onFileUploadStatus: (status: string, file: File) => void;
+    disabled?: boolean;
 }
 
-const FileUploadButton: React.FC<FileUploadButtonProps> = ({onFileUploadStatus }) => {
+const FileUploadButton: React.FC<FileUploadButtonProps> = ({onFileUploadStatus, disabled }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleButtonClick = () => {
@@ -53,7 +54,9 @@ const FileUploadButton: React.FC<FileUploadButtonProps> = ({onFileUploadStatus }
                 ref={fileInputRef} 
                 onChange={handleFileChange} 
             />
-            <button className="btn" onClick={handleButtonClick}>Upload</button>
+            <button className="btn" onClick={handleButtonClick} disabled={disabled}>
+                Upload
+            </button>
         </div>
     );
 };

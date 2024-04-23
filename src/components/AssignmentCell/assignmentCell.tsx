@@ -8,11 +8,11 @@ import fileIcon from '../../assets/icons8-file.svg'
 interface AssignmentCellProps {
     AssignmentName?: string | null; 
     dueDate?: string | null;
+    isPast?: boolean; // Optional prop to indicate if the assignment is in the past
 }
 
-const AssignmentCell: React.FC<AssignmentCellProps> = (props) => {
+const AssignmentCell: React.FC<AssignmentCellProps> = ({ AssignmentName, dueDate, isPast}) => {
 
-    const {AssignmentName} = props; 
     const effectiveAssignmentName = AssignmentName || "Default assignment name";
 
     const [file, setFile] = useState<File | null>(null);
@@ -44,7 +44,7 @@ const AssignmentCell: React.FC<AssignmentCellProps> = (props) => {
           <h2>{effectiveAssignmentName}</h2>
           <div className='left-align'>
             <AssignmentStatus status={status} evaluationStatus={evaluationStatus} />
-            <p>Due date: {props.dueDate || 'No due date'}</p>
+            <p>Due date: {dueDate || 'No due date'}</p>
           </div>
           <div className ='file-info'> 
             {file ? (
@@ -56,11 +56,14 @@ const AssignmentCell: React.FC<AssignmentCellProps> = (props) => {
             ) : null}
           </div>
         <div className='buttons-container'>
-          <FileUploadButton onFileUploadStatus={handleFileUpload} />
+          <FileUploadButton 
+            onFileUploadStatus={handleFileUpload}
+            disabled={isPast}
+             />
           <SubmitButton
             fileReference={file ? file.name : ""}  // Ensure a string is always passed
             onDataSubmit={handleDataSubmit}
-            disabled={!file}
+            disabled={!file || isPast}
             testMode={true}
           />
         </div>

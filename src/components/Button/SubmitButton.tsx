@@ -5,7 +5,7 @@ import Button from './Button';
 interface SubmitButtonProps {
   fileReference: string;  // Maybe this is a ID or token given back when the FileUploadButton have called its microservice
   onDataSubmit: (result: 'SUCCESS' | 'ERROR') => void;
-  disabled: boolean
+  disabled?: boolean
   testMode? : boolean; 
 }
 
