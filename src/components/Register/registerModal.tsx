@@ -70,7 +70,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ onClose }) => {
   return (
     <div className="modal-overlay">
       <div className="modal">
-        <h2>Register as a student</h2>
+        <h1>Register as a student</h1>
         <form onSubmit={(e) => { e.preventDefault(); handleRegistration(); }}>
           <input
             type="text"

@@ -16,6 +16,7 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [showRegisterModal, setShowRegisterModal] = useState(false);
 
+
   const handleShowRegisterModal = () => setShowRegisterModal(true);
   const handleHideRegisterModal = () => setShowRegisterModal(false);
 
@@ -82,34 +83,25 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  return (
+   return (
     <div className="login-container">
       <Slideshow />
-      <div className="login-box">
-        <h1>Welcome to Better Learning</h1>
-        <div className="login-form">
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <div className='btn-row'>
-            <Button onClick={handleLoginClick}>Login</Button>
-            <Button onClick={handleShowRegisterModal}>Create User</Button>
-            {showRegisterModal && (
-              <RegisterModal onClose={handleHideRegisterModal} />
-            )}
+      {showRegisterModal ? (
+        <RegisterModal onClose={handleHideRegisterModal} />
+      ) : (
+        <div className="login-box">
+          <h1>Welcome to Better Learning</h1>
+          <div className="login-form">
+            <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
+            <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <div className='btn-row'>
+              <Button onClick={handleLoginClick}>Login</Button>
+              <Button onClick={handleShowRegisterModal}>Register</Button>
+            </div>
+            {error && <div className="error">{error}</div>}
           </div>
-          {error && <div className="error">{error}</div>}
         </div>
-      </div>
+      )}
     </div>
   );
 };
