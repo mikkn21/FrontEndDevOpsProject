@@ -26,13 +26,40 @@ const LoginPage: React.FC = () => {
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
     event.preventDefault();
-    console.log("Login clicked");
     setError("");
 
     // ADMIN login that can be used to bypass the authentication
-    if (username == "ADMIN" && password == "ADMIN") {
-      const adminTokenValue = `adminToken|${username}`;
-      Cookies.set("adminToken", adminTokenValue, {
+    if (username === "ADMIN" && password === "ADMIN") {
+      const role = "admin";
+      const tokenValue = `adminToken|${username}|${role}`;
+      Cookies.set("adminToken", tokenValue, {
+        expires: 1,
+        secure: true,
+        sameSite: "strict",
+      });
+      navigate("/");
+      return;
+    }
+
+    // DUMMY DATA:
+    // STUDENT login
+    if (username === "student" && password === "student") {
+      const role = "student";
+      const tokenValue = `adminToken|${username}|${role}`;
+      Cookies.set("adminToken", tokenValue, {
+        expires: 1,
+        secure: true,
+        sameSite: "strict",
+      });
+      navigate("/");
+      return;
+    }
+  
+    // TEACHER login
+    if (username === "teacher" && password === "teacher") {
+      const role = "teacher";
+      const tokenValue = `adminToken|${username}|${role}`;
+      Cookies.set("adminToken", tokenValue, {
         expires: 1,
         secure: true,
         sameSite: "strict",
@@ -55,7 +82,7 @@ const LoginPage: React.FC = () => {
       if (response.status === 200 && response.data.token) {
         // Expires in should be reduced to the number of days? Which is fucked as we want to specify something like seconds.
         // can just be converted to 0.xx days?
-        Cookies.set("token", response.data.token, {
+        Cookies.set("jwtToken", response.data.token, {
           expires: response.data.expires_in,
           secure: true,
           sameSite: "strict",
@@ -63,7 +90,6 @@ const LoginPage: React.FC = () => {
         navigate("/");
       }
     } catch (error) {
-      console.log("hello");
       if (axios.isAxiosError(error)) {
         const status = error.response?.status;
         if (status === 400) {
@@ -77,7 +103,6 @@ const LoginPage: React.FC = () => {
         }
       } else {
         // Handle non-Axios errors
-        console.log("Non-Axios error:", error);
         setError("An unexpected error occurred. Please try again later.");
       }
     }
