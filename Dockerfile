@@ -2,14 +2,15 @@ FROM nginx:alpine
 
 ARG BUILD_DIRECTORY=dist
 
+COPY nginx /
 COPY $BUILD_DIRECTORY /usr/share/nginx/html
-COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+RUN chmod +x docker-entrypoint.sh
 
 RUN adduser -D webuser \
     && chown -R webuser:webuser /usr/share/nginx/html \
-    && chown webuser:webuser /var/cache/nginx /var/run /var/log/nginx
+    && chown webuser:webuser /var/cache/nginx /var/run /var/log/nginx \
+    && chown webuser:webuser /docker-entrypoint.sh
 
 USER webuser
 
-CMD ["nginx", "-g", "daemon off;"]
-
+CMD ["/docker-entrypoint.sh"]

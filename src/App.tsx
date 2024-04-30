@@ -1,15 +1,16 @@
-import React, { useEffect} from 'react';
-import ProtectedRoute from './components/ProtectedRoute/protectedRoute';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import LoginPage from './pages/login/login'; 
-import Page1 from './pages/page1/page1'; 
-import Page2 from './pages/Page2/page2';
-import Home from './pages/home/home';
-
+import React, { useEffect } from "react";
+import ProtectedRoute from "./components/ProtectedRoute/protectedRoute";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import LoginPage from "./pages/login/login";
+import Page1 from "./pages/page1/page1";
+import Page2 from "./pages/Page2/page2";
+import Home from "./pages/home/home";
+import { loadConfig } from "./config";
 
 const App: React.FC = () => {
+  loadConfig();
   useEffect(() => {
-    document.title = "Better Learning"; 
+    document.title = "Better Learning";
   }, []);
 
   return (
@@ -17,15 +18,18 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
 
-        <Route path="/" element={
-          <ProtectedRoute requireAdmin={false} element={<Home />}/>
-        }/>
-        <Route path="/p1" element= {
-          <ProtectedRoute requireAdmin={false} element={<Page1 />}/>
-        }/>
-        <Route path="/p2" element= {
-          <ProtectedRoute requireAdmin={false} element={<Page2 />}/>
-        }/>
+        <Route
+          path="/"
+          element={<ProtectedRoute requireAdmin={false} element={<Home />} />}
+        />
+        <Route
+          path="/p1"
+          element={<ProtectedRoute requireAdmin={false} element={<Page1 />} />}
+        />
+        <Route
+          path="/p2"
+          element={<ProtectedRoute requireAdmin={false} element={<Page2 />} />}
+        />
       </Routes>
     </BrowserRouter>
   );
