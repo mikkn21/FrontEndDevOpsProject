@@ -67,7 +67,6 @@ jobs:
           file: ./Dockerfile
           push: false
           load: true
-          platforms: linux/amd64,linux/ppc64le
           build-args: VERSION=v${{ needs.version-and-tag.outputs.tag }}
           tags: ${{ needs.version-and-tag.outputs.tag }}
 
@@ -80,7 +79,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          platforms: linux/amd64,linux/ppc64le
+          platforms: linux/amd64,linux/ppc64le,linux/arm64
           push: true
           tags: |
             ${{ env.GITHUB_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.version-and-tag.outputs.tag }}
