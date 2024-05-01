@@ -8,6 +8,9 @@ export const config: APIEnvVars = {
 
 export async function loadConfig() {
   const configuration = import.meta.env.PROD ? await fetchApi() : fetchLocal();
+  configuration.VITE_BACKEND_URL = import.meta.env.PROD
+    ? config.VITE_BACKEND_URL
+    : "";
   Object.assign(config, configuration);
 }
 

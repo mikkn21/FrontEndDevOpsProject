@@ -5,10 +5,11 @@ import LoginPage from "./pages/login/login";
 import Page1 from "./pages/page1/page1";
 import Page2 from "./pages/Page2/page2";
 import Home from "./pages/home/home";
-import { loadConfig } from "./config";
+import { loadConfig, config } from "./config";
 
 const App: React.FC = () => {
   loadConfig();
+  console.log("config", config);
   useEffect(() => {
     document.title = "Better Learning";
   }, []);

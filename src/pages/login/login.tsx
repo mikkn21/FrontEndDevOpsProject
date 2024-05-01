@@ -7,7 +7,7 @@ import Button from "../../components/Button/Button";
 import Slideshow from "../../components/SlideShow/slideShow";
 import HashPass from "../../components/HashPass/passwordHash";
 import RegisterModal from "../../components/Register/registerModal";
-
+import { config } from "../../config";
 
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -16,11 +16,8 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [showRegisterModal, setShowRegisterModal] = useState(false);
 
-
   const handleShowRegisterModal = () => setShowRegisterModal(true);
   const handleHideRegisterModal = () => setShowRegisterModal(false);
-
-
 
   const handleLoginClick = async (
     event: React.MouseEvent<HTMLButtonElement>
@@ -54,7 +51,7 @@ const LoginPage: React.FC = () => {
       navigate("/");
       return;
     }
-  
+
     // TEACHER login
     if (username === "teacher" && password === "teacher") {
       const role = "teacher";
@@ -68,7 +65,7 @@ const LoginPage: React.FC = () => {
       return;
     }
 
-    const endpoint = "/login/authentication";
+    const endpoint = `${config.VITE_BACKEND_URL}/login/authentication`;
 
     // Get the hashed password to send to the backend
     const hashedPassword = await HashPass(password);
@@ -108,7 +105,7 @@ const LoginPage: React.FC = () => {
     }
   };
 
-   return (
+  return (
     <div className="login-container">
       <Slideshow />
       {showRegisterModal ? (
@@ -117,9 +114,19 @@ const LoginPage: React.FC = () => {
         <div className="login-box">
           <h1>Welcome to Better Learning</h1>
           <div className="login-form">
-            <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
-            <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-            <div className='btn-row'>
+            <input
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <div className="btn-row">
               <Button onClick={handleLoginClick}>Login</Button>
               <Button onClick={handleShowRegisterModal}>Register</Button>
             </div>
