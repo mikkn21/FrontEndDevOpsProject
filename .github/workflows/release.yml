@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     branches:
-      - main
+      - DISABLED
 
 env:
   GITHUB_REGISTRY: ghcr.io
