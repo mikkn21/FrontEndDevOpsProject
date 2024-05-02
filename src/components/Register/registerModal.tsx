@@ -1,32 +1,32 @@
-import React, { useState } from 'react';
-import './registerModal.css'
+import React, { useState } from "react";
+import "./registerModal.css";
 import Button from "../Button/Button";
 import axios from "axios";
-import Cookies from "js-cookie"
 import { useNavigate } from "react-router-dom";
 import HashPass from "../../components/HashPass/passwordHash";
+import { loginResponse } from "../../pages/login/login";
 
 interface RegisterModalProps {
   onClose: () => void;
 }
 
 const RegisterModal: React.FC<RegisterModalProps> = ({ onClose }) => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleRegistration = async () => {
     // Implement registration logic here
     // For example, API call to thebackend to create a new user
-    console.log("Registering", { username, password});
+    console.log("Registering", { username, password });
     setError("");
 
     const endpoint = "/api/register";
 
     // Get the hashed password to send to the backend
     const hashedPassword = await HashPass(password);
-    
+
     try {
       console.log("BEFORE ERROR");
       const response = await axios.post(endpoint, {
@@ -37,11 +37,9 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ onClose }) => {
       if (response.status === 200 && response.data.token) {
         // Expires in should be reduced to the number of days? Which is fucked as we want to specify something like seconds.
         // can just be converted to 0.xx days?
-        Cookies.set("token", response.data.token, {
-          expires: response.data.expires_in,
-          secure: true,
-          sameSite: "strict",
-        });
+        // TODO: get token for the newly registered user
+        loginResponse.expires_in = response.data.expires_in;
+        loginResponse.token = "FIXME";
         // Close the modal upon successful registration
         onClose();
         navigate("/");
@@ -64,14 +62,19 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ onClose }) => {
         console.log("ERROR HERE");
         setError("An unexpected error occurred. Please try again later.");
       }
-    } 
+    }
   };
 
   return (
     <div className="modal-overlay">
       <div className="modal">
         <h1>Register as a student</h1>
-        <form onSubmit={(e) => { e.preventDefault(); handleRegistration(); }}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleRegistration();
+          }}
+        >
           <input
             type="text"
             placeholder="Username"
@@ -96,5 +99,3 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ onClose }) => {
 };
 
 export default RegisterModal;
-
-

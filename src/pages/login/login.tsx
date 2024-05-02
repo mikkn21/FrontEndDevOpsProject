@@ -2,14 +2,21 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./login.css";
-import Cookies from "js-cookie";
 import Button from "../../components/Button/Button";
 import Slideshow from "../../components/SlideShow/slideShow";
 import HashPass from "../../components/HashPass/passwordHash";
 import RegisterModal from "../../components/Register/registerModal";
 import { config } from "../../config";
-import { TOKEN_NAME } from "../../utils/cookieUtils";
 
+type LoginResponse = {
+  token: string;
+  expires_in: number;
+};
+
+const loginResponse: LoginResponse = {
+  token: "",
+  expires_in: 0,
+};
 
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -30,11 +37,10 @@ const LoginPage: React.FC = () => {
     // ADMIN login that can be used to bypass the authentication
     if (username === "ADMIN" && password === "ADMIN") {
       const role = "admin";
-      const tokenValue = `${TOKEN_NAME}|${username}|${role}`;
-      Cookies.set(TOKEN_NAME, tokenValue, {
-        expires: 1,
-        secure: false,
-        sameSite: "none",
+      const tokenValue = `${"authToken"}|${username}|${role}`;
+      Object.assign(loginResponse, {
+        token: tokenValue,
+        expires_in: 1,
       });
       navigate("/");
       return;
@@ -44,11 +50,10 @@ const LoginPage: React.FC = () => {
     // STUDENT login
     if (username === "student" && password === "student") {
       const role = "student";
-      const tokenValue = `${TOKEN_NAME}|${username}|${role}`;
-      Cookies.set(TOKEN_NAME, tokenValue, {
-        expires: 1,
-        secure: false,
-        sameSite: "none",
+      const tokenValue = `${"authToken"}|${username}|${role}`;
+      Object.assign(loginResponse, {
+        token: tokenValue,
+        expires_in: 1,
       });
       navigate("/");
       return;
@@ -57,11 +62,10 @@ const LoginPage: React.FC = () => {
     // TEACHER login
     if (username === "teacher" && password === "teacher") {
       const role = "teacher";
-      const tokenValue = `${TOKEN_NAME}|${username}|${role}`;
-      Cookies.set(TOKEN_NAME, tokenValue, {
-        expires: 1,
-        secure: false,
-        sameSite: "none",
+      const tokenValue = `${"authToken"}|${username}|${role}`;
+      Object.assign(loginResponse, {
+        token: tokenValue,
+        expires_in: 1,
       });
       navigate("/");
       return;
@@ -81,10 +85,8 @@ const LoginPage: React.FC = () => {
       if (response.status === 200 && response.data.token) {
         // Expires in should be reduced to the number of days? Which is fucked as we want to specify something like seconds.
         // can just be converted to 0.xx days?
-        Cookies.set(TOKEN_NAME, response.data.token, {
-          expires: response.data.expires_in,
-          secure: false,
-          sameSite: "none",
+        Object.assign(loginResponse, {
+          //?
         });
         navigate("/");
       }
@@ -140,4 +142,4 @@ const LoginPage: React.FC = () => {
   );
 };
 
-export default LoginPage;
+export { LoginPage, loginResponse };

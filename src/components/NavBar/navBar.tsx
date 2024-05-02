@@ -1,10 +1,10 @@
 import React from "react";
-import Cookies from "js-cookie";
 import { NavLink, useNavigate } from "react-router-dom"; // Import NavLink
 import "./navBar.css";
 import logo from "../../../public/favicon.png";
 import Button from "../Button/Button";
-import { getCookieUsername, TOKEN_NAME } from "../../utils/cookieUtils";
+import { getCookieUsername } from "../../utils/cookieUtils";
+import { loginResponse } from "../../pages/login/login";
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
@@ -12,7 +12,8 @@ const Navbar: React.FC = () => {
   let username = getCookieUsername();
 
   const handleLogout = () => {
-    Cookies.remove(TOKEN_NAME);
+    loginResponse.expires_in = 0;
+    loginResponse.token = "";
     navigate("/login"); // Assuming you have a login route
   };
 

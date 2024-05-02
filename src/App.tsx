@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import ProtectedRoute from "./components/ProtectedRoute/protectedRoute";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import LoginPage from "./pages/login/login";
+import { LoginPage } from "./pages/login/login";
 import Page1 from "./pages/page1/page1";
 import Page2 from "./pages/Page2/page2";
 import Home from "./pages/home/home";
