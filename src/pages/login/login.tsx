@@ -34,7 +34,7 @@ const LoginPage: React.FC = () => {
       Cookies.set(TOKEN_NAME, tokenValue, {
         expires: 1,
         secure: false,
-        sameSite: "strict",
+        sameSite: "none",
       });
       navigate("/");
       return;
@@ -48,7 +48,7 @@ const LoginPage: React.FC = () => {
       Cookies.set(TOKEN_NAME, tokenValue, {
         expires: 1,
         secure: false,
-        sameSite: "strict",
+        sameSite: "none",
       });
       navigate("/");
       return;
@@ -61,7 +61,7 @@ const LoginPage: React.FC = () => {
       Cookies.set(TOKEN_NAME, tokenValue, {
         expires: 1,
         secure: false,
-        sameSite: "strict",
+        sameSite: "none",
       });
       navigate("/");
       return;
@@ -84,7 +84,7 @@ const LoginPage: React.FC = () => {
         Cookies.set(TOKEN_NAME, response.data.token, {
           expires: response.data.expires_in,
           secure: false,
-          sameSite: "strict",
+          sameSite: "none",
         });
         navigate("/");
       }

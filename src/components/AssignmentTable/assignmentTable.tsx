@@ -4,6 +4,7 @@ import './assignmentTable.css';
 import AssignmentCell from '../AssignmentCell/assignmentCell';
 import { getCookie, getCookieRole } from '../../utils/cookieUtils';
 import Button from '../Button/Button';
+import InputModal from '../AssignmentAddModal/inputModal';
 
 
 interface Assignment {
@@ -24,6 +25,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({ testMode = false }) =
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<{message: string } | null>(null);
     const [currentPage, setCurrentPage] = useState(0);
+    const [showModal, setShowModal] = useState(false);
     const pageSize = 2; // Number of assignments per page
 
     const role = getCookieRole();
@@ -38,21 +40,14 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({ testMode = false }) =
         ));
     };
     
-    const currentDate = new Date().toISOString().slice(0, 10);
-
-    const handleCreateAssignment = () => {
-        // NOTE: This should ask the user for data and then send it to the backend
-        
-        // Generate a new dummy assignment object
-        console.log("Clicked create assignment");
+    const handleSaveAssignment = (assignment: { name: string; dueDate: string }) => {
         const newAssignment: Assignment = {
-        id: assignments.length + 1, 
-        name: `New Assignment ${assignments.length + 1}`,
-        dueDate: currentDate
-    };
-
-    // Add the new assignment to the list of assignments
-    setAssignments(prevAssignments => [...prevAssignments, newAssignment]);
+            id: assignments.length + 1,
+            name: assignment.name,
+            dueDate: assignment.dueDate,
+            isPaused: false  // default value
+        };
+        setAssignments(prevAssignments => [...prevAssignments, newAssignment]);
     };
 
 
@@ -151,7 +146,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({ testMode = false }) =
                         </div>
                         <div className='right-button'>
                         {role === 'teacher' && (
-                            <Button onClick={handleCreateAssignment}>Add Assignment</Button>
+                             <Button onClick={() => setShowModal(true)}>Add Assignment</Button> // Updated to show modal
                         )}
                         </div>
                     </div>
@@ -176,6 +171,11 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({ testMode = false }) =
                 <span>Page {currentPage + 1}</span>
                 <button onClick={nextPage} disabled={(currentPage + 1) * pageSize >= filteredAssignments.length}>Next</button>
             </div>
+            <InputModal
+            isOpen={showModal}
+            onClose={() => setShowModal(false)}
+            onSave={handleSaveAssignment}
+            />
         </div>
     );
 }
