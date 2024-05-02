@@ -32,6 +32,16 @@
     margin: 0.2em; 
   }
 
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.right-button {
+    margin-left: auto;
+}
+
 .pagination {
     display: flex;
     justify-content: left;

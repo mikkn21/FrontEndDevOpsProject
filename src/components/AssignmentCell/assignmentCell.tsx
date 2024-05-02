@@ -4,7 +4,7 @@ import AssignmentStatus from '../AssignmentStatus/AssignmentStatus';
 import FileUploadButton from '../Button/FileUploadButton';
 import SubmitButton from '../Button/SubmitButton';
 import fileIcon from '../../assets/icons8-file.svg'
-import { AiOutlinePlayCircle, AiOutlinePauseCircle, AiOutlineDelete, AiOutlinePlus } from "react-icons/ai";
+import { AiOutlinePlayCircle, AiOutlinePauseCircle, AiOutlineDelete } from "react-icons/ai";
 
 
 

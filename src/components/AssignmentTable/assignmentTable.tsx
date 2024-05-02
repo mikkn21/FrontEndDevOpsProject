@@ -149,7 +149,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({ testMode = false }) =
                             <Button onClick={showCurrent}>Current</Button>
                             <Button onClick={showPast}>Past</Button>
                         </div>
-                        <div>
+                        <div className='right-button'>
                         {role === 'teacher' && (
                             <Button onClick={handleCreateAssignment}>Add Assignment</Button>
                         )}
