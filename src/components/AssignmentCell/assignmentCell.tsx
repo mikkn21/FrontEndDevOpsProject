@@ -4,16 +4,23 @@ import AssignmentStatus from '../AssignmentStatus/AssignmentStatus';
 import FileUploadButton from '../Button/FileUploadButton';
 import SubmitButton from '../Button/SubmitButton';
 import fileIcon from '../../assets/icons8-file.svg'
+import { AiOutlinePlayCircle, AiOutlinePauseCircle, AiOutlineDelete, AiOutlinePlus } from "react-icons/ai";
+
+
 
 interface AssignmentCellProps {
-    AssignmentName?: string | null; 
+    assignmentId: number;
+    assignmentName?: string | null;
     dueDate?: string | null;
-    isPast?: boolean; // Optional prop to indicate if the assignment is in the past
+    isPast?: boolean; 
+    isPaused?: boolean;
+    onPause?: () => void;
+    onDelete?: (id: number) => void;
 }
 
-const AssignmentCell: React.FC<AssignmentCellProps> = ({ AssignmentName, dueDate, isPast}) => {
+const AssignmentCell: React.FC<AssignmentCellProps> = ({ assignmentId, assignmentName, dueDate, isPast, isPaused, onPause, onDelete }) => {
 
-    const effectiveAssignmentName = AssignmentName || "Default assignment name";
+    const effectiveAssignmentName = assignmentName || "Default assignment name";
 
     const [file, setFile] = useState<File | null>(null);
     const [status, setStatus] = useState('NOT SUBMITTED'); 
@@ -41,6 +48,18 @@ const AssignmentCell: React.FC<AssignmentCellProps> = ({ AssignmentName, dueDate
 
     return (
       <div className='cell'>
+        <div className='teacherStuff'>
+          {onDelete && (
+                  <button className="delete-button" onClick={() => onDelete(assignmentId)}>
+                      <AiOutlineDelete />
+                  </button>
+              )}
+            {onPause && (
+              <button className="pause-button" onClick={onPause}>
+                    {isPaused ? <AiOutlinePlayCircle /> : <AiOutlinePauseCircle />}
+              </button>
+            )}
+          </div>
           <h2>{effectiveAssignmentName}</h2>
           <div className='left-align'>
             <AssignmentStatus status={status} evaluationStatus={evaluationStatus} />
@@ -58,12 +77,12 @@ const AssignmentCell: React.FC<AssignmentCellProps> = ({ AssignmentName, dueDate
         <div className='buttons-container'>
           <FileUploadButton 
             onFileUploadStatus={handleFileUpload}
-            disabled={isPast}
+            disabled={isPast || isPaused}
              />
           <SubmitButton
             fileReference={file ? file.name : ""}  // Ensure a string is always passed
             onDataSubmit={handleDataSubmit}
-            disabled={!file || isPast}
+            disabled={!file || isPast || isPaused}
             testMode={true}
           />
         </div>

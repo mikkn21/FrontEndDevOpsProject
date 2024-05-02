@@ -1,6 +1,8 @@
 import { jwtDecode } from "jwt-decode";
+import Cookies from "js-cookie";
 
 
+export const TOKEN_NAME = "authToken";
 
 interface DecodedToken {
   role?: string;
@@ -8,6 +10,28 @@ interface DecodedToken {
   [key: string]: any;
   // Define other expected properties from the token payload if necessary
 }
+
+export function getCookieUsername(): string | null {
+  return extractCookieInformation(1);
+}
+
+export function getCookieRole(): string | null {
+  return extractCookieInformation(2);
+}
+
+function extractCookieInformation(i: number): string | null {
+  const authToken = Cookies.get(TOKEN_NAME);
+  if (authToken) {
+    const parts = authToken.split("|");
+    if (parts.length > 1 && parts[0] === TOKEN_NAME && parts.length > i) {
+      return parts[i];
+      // username = parts[1]
+      // role = parts[2]
+    }
+  }
+  return null; 
+}
+
 
 
 // Fetches the JWT from a cookie and decodes it

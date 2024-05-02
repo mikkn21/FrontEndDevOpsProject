@@ -10,6 +10,37 @@
   margin: 10px 0;
 }
 
+.teacherStuff {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+  width: 100%; 
+  padding-right: 10px;
+}
+
+.teacherStuff button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit; 
+}
+
+.teacherStuff button svg {
+  width: 18px;  /* Controls the width of the SVG icon */
+  height: 18px; /* Controls the height of the SVG icon */
+}
+
+.teacherStuff button:last-child {
+  margin-right: 10px;
+}
+
+.teacherStuff button:hover {
+  background-color: rgba(0,0,0,0.1); 
+}
 
 
 .file-info {

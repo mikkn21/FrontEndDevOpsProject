@@ -5,6 +5,10 @@
     min-width: 500px;
 }
 
+.buttons-container {
+    margin-bottom: 1.3em;
+}
+
 .table-header {
     /* background-color: #f4f4f4; */
     background-color: #C2C0A2;
@@ -34,8 +38,7 @@
     gap: 0.3em;
 }
  
-.cell {
-    margin-top: 1.2em;
+.teacherStuff {
     margin-bottom: 1.2em;
 }
 

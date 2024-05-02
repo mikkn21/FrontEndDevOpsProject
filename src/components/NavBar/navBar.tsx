@@ -4,22 +4,15 @@ import { NavLink, useNavigate } from "react-router-dom"; // Import NavLink
 import "./navBar.css";
 import logo from "../../../public/favicon.png";
 import Button from "../Button/Button";
+import { getCookieUsername, TOKEN_NAME } from "../../utils/cookieUtils";
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
 
-  const adminToken = Cookies.get("adminToken");
-  let username: string | null = null;
-
-  if (adminToken) {
-    const parts = adminToken.split("|");
-    if (parts.length > 1 && parts[0] === "adminToken") {
-      username = parts[1];
-    }
-  }
+  let username = getCookieUsername();
 
   const handleLogout = () => {
-    Cookies.remove("adminToken");
+    Cookies.remove(TOKEN_NAME);
     navigate("/login"); // Assuming you have a login route
   };
 

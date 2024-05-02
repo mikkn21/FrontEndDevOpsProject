@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './assignmentTable.css';
 import AssignmentCell from '../AssignmentCell/assignmentCell';
-import { getCookie } from '../../utils/cookieUtils';
+import { getCookie, getCookieRole } from '../../utils/cookieUtils';
 import Button from '../Button/Button';
 
 
@@ -10,6 +10,7 @@ interface Assignment {
     id: number;
     name: string;
     dueDate: string;
+    isPaused?: boolean;
     // other properties...
 }
 
@@ -25,6 +26,34 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({ testMode = false }) =
     const [currentPage, setCurrentPage] = useState(0);
     const pageSize = 2; // Number of assignments per page
 
+    const role = getCookieRole();
+
+    const handleDeleteAssignment = (assignmentId: number) => {
+        setAssignments(prevAssignments => prevAssignments.filter(a => a.id !== assignmentId));
+    };
+
+    const handlePauseAssignment = (assignmentId: number) => {
+        setAssignments(prevAssignments => prevAssignments.map(assignment =>
+            assignment.id === assignmentId ? { ...assignment, isPaused: !assignment.isPaused } : assignment
+        ));
+    };
+    
+    const currentDate = new Date().toISOString().slice(0, 10);
+
+    const handleCreateAssignment = () => {
+        // NOTE: This should ask the user for data and then send it to the backend
+        
+        // Generate a new dummy assignment object
+        console.log("Clicked create assignment");
+        const newAssignment: Assignment = {
+        id: assignments.length + 1, 
+        name: `New Assignment ${assignments.length + 1}`,
+        dueDate: currentDate
+    };
+
+    // Add the new assignment to the list of assignments
+    setAssignments(prevAssignments => [...prevAssignments, newAssignment]);
+    };
 
 
     useEffect(() => {
@@ -115,19 +144,30 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({ testMode = false }) =
             <div className='table'>
                 <div className='table-header assignment-table-header'>
                     <h1>Assignments</h1>
-                    <div>
-                        <Button onClick={showCurrent}>Current</Button>
-                        <Button onClick={showPast}>Past</Button>
+                    <div className='button-container'>
+                        <div>
+                            <Button onClick={showCurrent}>Current</Button>
+                            <Button onClick={showPast}>Past</Button>
+                        </div>
+                        <div>
+                        {role === 'teacher' && (
+                            <Button onClick={handleCreateAssignment}>Add Assignment</Button>
+                        )}
+                        </div>
                     </div>
                 </div>
-                <div >
+                <div>
                     {pagedAssignments.map(assignment => (
                         <AssignmentCell 
-                            key={assignment.id} 
-                            AssignmentName={assignment.name} 
+                            key={assignment.id}
+                            assignmentId={assignment.id}    
+                            assignmentName={assignment.name}
                             dueDate={assignment.dueDate}
-                            isPast={new Date(assignment.dueDate) < new Date()} 
-                         />
+                            isPast={new Date(assignment.dueDate) < new Date()}
+                            isPaused={assignment.isPaused}
+                            onDelete={role === 'teacher' ? handleDeleteAssignment : undefined} 
+                            onPause={role === 'teacher' ? () => handlePauseAssignment(assignment.id) : undefined } 
+                        />
                     ))}
                 </div>
             </div>

@@ -5,6 +5,7 @@ import AssignmentTable from '../../components/AssignmentTable/assignmentTable';
 
 const home: React.FC = () => {
 
+
     return (
         <div>
         <Navbar />
