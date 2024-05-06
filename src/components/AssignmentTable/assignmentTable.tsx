@@ -25,10 +25,10 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
   const [filteredAssignments, setFilteredAssignments] = useState<Assignment[]>(
     []
   );
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<{ message: string } | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<{ message: string } | null>(null);
   const pageSize = 2; // Number of assignments per page
 
   const role = getCookieRole();
@@ -49,6 +49,10 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
     );
   };
 
+  const handleOpenModal = () => {
+    setShowModal(true); 
+  };
+
   const handleSaveAssignment = (assignment: {
     name: string;
     dueDate: string;
@@ -62,15 +66,16 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
     setAssignments((prevAssignments) => [...prevAssignments, newAssignment]);
   };
 
+
   useEffect(() => {
     if (testMode) {
       // In test mode, use dummy data instead of fetching from the API
       const testAssignments: Assignment[] = [
-        { id: 1, name: "Test Assignment 1", dueDate: "2024-05-01" },
-        { id: 2, name: "Test Assignment 2", dueDate: "2024-05-02" },
-        { id: 3, name: "Test Assignment 3", dueDate: "2024-05-03" },
-        { id: 4, name: "Test Assignment 4", dueDate: "2024-05-04" },
-        { id: 5, name: "Test Assignment 5", dueDate: "2024-05-05" },
+        { id: 1, name: "Test Assignment 1", dueDate: "2024-06-01" },
+        { id: 2, name: "Test Assignment 2", dueDate: "2024-06-02" },
+        { id: 3, name: "Test Assignment 3", dueDate: "2024-06-03" },
+        { id: 4, name: "Test Assignment 4", dueDate: "2024-06-04" },
+        { id: 5, name: "Test Assignment 5", dueDate: "2023-05-05" },
         { id: 6, name: "Test Assignment 6", dueDate: "2023-05-05" },
       ];
       setAssignments(testAssignments);
@@ -162,9 +167,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
             </div>
             <div className="right-button">
               {role === "teacher" && (
-                <Button onClick={() => setShowModal(true)}>
-                  Add Assignment
-                </Button> // Updated to show modal
+                <Button onClick={handleOpenModal}>Add Assignment</Button> 
               )}
             </div>
           </div>
@@ -200,11 +203,14 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
           Next
         </button>
       </div>
+      {showModal && (
       <InputModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         onSave={handleSaveAssignment}
-      />
+        testMode={true}
+      /> 
+      )}
     </div>
   );
 };
