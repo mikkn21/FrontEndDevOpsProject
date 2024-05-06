@@ -5,6 +5,10 @@ export interface Assignment {
     selectedStudents?: Student[]; 
     file?: File;
     isPaused?: boolean;
+    visible: boolean;
+    maxTime: number;
+    maxMem: number;
+    vCpu: number;
     // other properties...
   }
 

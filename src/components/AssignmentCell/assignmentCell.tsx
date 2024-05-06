@@ -5,28 +5,27 @@ import FileUploadButton from '../Button/FileUploadButton';
 import SubmitButton from '../Button/SubmitButton';
 import fileIcon from '../../assets/icons8-file.svg'
 import { AiOutlinePlayCircle, AiOutlinePauseCircle, AiOutlineDelete, AiOutlineSetting } from "react-icons/ai";
-
-
+import { Assignment } from '../../utils/types';
+import { getCookieRole } from '../../utils/cookieUtils';
 
 interface AssignmentCellProps {
-    assignmentId: number;
-    assignmentName?: string | null;
-    dueDate?: string | null;
+    assignment : Assignment;
     isPast?: boolean; 
-    isPaused?: boolean;
     onPause?: () => void;
     onDelete?: (id: number) => void;
     onConfigure?: (id: number) => void;
 }
 
-const AssignmentCell: React.FC<AssignmentCellProps> = ({ assignmentId, assignmentName, dueDate, isPast, isPaused, onPause, onDelete, onConfigure }) => {
+const AssignmentCell: React.FC<AssignmentCellProps> = ({assignment, isPast, onPause, onDelete, onConfigure }) => {
 
-    const effectiveAssignmentName = assignmentName || "Default assignment name";
+    const effectiveAssignmentName = assignment.name || "Default assignment name";
 
     const [file, setFile] = useState<File | null>(null);
     const [status, setStatus] = useState('NOT SUBMITTED'); 
     const [evaluationStatus, setEvaluationStatus] = useState<null | 'SUCCESS' | 'ERROR'>(null);
-  
+
+    const role = getCookieRole();
+
     const handleDataSubmit = (result: 'SUCCESS' | 'ERROR') => {
       setEvaluationStatus(result);
       if (result === 'SUCCESS') {
@@ -47,21 +46,24 @@ const AssignmentCell: React.FC<AssignmentCellProps> = ({ assignmentId, assignmen
       setEvaluationStatus(null);
     };
 
+    // Make assignemnt with visible false dimmed for teachers
+    const isTeacherAndHidden = role === 'teacher' && !assignment.visible;
+
     return (
-      <div className='cell'>
+      <div className={`cell ${isTeacherAndHidden ? 'dimmed' : ''}`}>
         <div className='teacherStuff'>
           {onDelete && (
-                  <button className="delete-button" onClick={() => onDelete(assignmentId)}>
+                  <button className="delete-button" onClick={() => onDelete(assignment.id)}>
                       <AiOutlineDelete />
                   </button>
               )}
             {onPause && (
               <button className="pause-button" onClick={onPause}>
-                    {isPaused ? <AiOutlinePlayCircle /> : <AiOutlinePauseCircle />}
+                    {assignment.isPaused ? <AiOutlinePlayCircle /> : <AiOutlinePauseCircle />}
               </button>
             )}
             {onConfigure && (
-              <button className="configure-button" onClick={() => onConfigure(assignmentId)}>
+              <button className="configure-button" onClick={() => onConfigure(assignment.id)}>
                   <AiOutlineSetting />
               </button>
             
@@ -70,7 +72,7 @@ const AssignmentCell: React.FC<AssignmentCellProps> = ({ assignmentId, assignmen
           <h2>{effectiveAssignmentName}</h2>
           <div className='left-align'>
             <AssignmentStatus status={status} evaluationStatus={evaluationStatus} />
-            <p>Due date: {dueDate || 'No due date'}</p>
+            <p>Due date: {assignment.dueDate || 'No due date'}</p>
           </div>
           <div className ='file-info'> 
             {file ? (
@@ -84,12 +86,12 @@ const AssignmentCell: React.FC<AssignmentCellProps> = ({ assignmentId, assignmen
         <div className='buttons-container'>
           <FileUploadButton 
             onFileUploadStatus={handleFileUpload}
-            disabled={isPast || isPaused}
+            disabled={isPast || assignment.isPaused}
              />
           <SubmitButton
             fileReference={file ? file.name : ""}  // Ensure a string is always passed
             onDataSubmit={handleDataSubmit}
-            disabled={!file || isPast || isPaused}
+            disabled={!file || isPast || assignment.isPaused}
             testMode={true}
           />
         </div>

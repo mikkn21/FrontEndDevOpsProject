@@ -96,3 +96,12 @@ button[disabled] {
   color: #666;
   cursor: not-allowed;
 }
+
+.cell.dimmed {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.cell.dimmed .teacherStuff button {
+  pointer-events: auto;
+}

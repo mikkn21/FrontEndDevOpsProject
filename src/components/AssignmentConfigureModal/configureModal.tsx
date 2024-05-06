@@ -11,7 +11,16 @@ interface InputModalProps {
     assignment: Assignment;
     isOpen: boolean;
     onClose: () => void;
-    onSave: (assignment: { name: string; dueDate: string; selectedStudents: Student[]; file?: File | null }) => void;  
+    onSave: (assignment: { 
+        name: string;
+        dueDate: string;
+        selectedStudents: Student[];
+        file?: File;
+        visible: boolean;
+        maxTime: number;
+        maxMem: number;
+        vCpu: number;
+    }) => void; 
     testMode?: boolean;
 }
 
@@ -24,6 +33,10 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<{ message: string } | null>(null);
     const [file, setFile] = useState<File | null>(assignment.file || null);
+    const [visible, setVisible] = useState(true); // Default to true
+    const [maxTime, setMaxTime] = useState(0); // Default to 0
+    const [maxMem, setmaxMem] = useState(0); // Default to 0
+    const [vCpu, setVCpu] = useState(0); // Default to 0
 
     const endpoint = `/api/ENDPOINT`; // Adjust URL to your actual API endpoint
 
@@ -32,6 +45,10 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
     useEffect(() => {
         setName(assignment.name);
         setDueDate(assignment.dueDate);
+        setVisible(assignment.visible);
+        setMaxTime(assignment.maxTime);
+        setmaxMem(assignment.maxMem);
+        setVCpu(assignment.vCpu);
         setSelectedStudents(assignment.selectedStudents || []);
         setFile(assignment.file || null);
     }, [assignment]);
@@ -40,12 +57,15 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
     const handleSubmit = async () => {
         if (testMode) {
             onSave({
-                ...assignment,
                 name,
                 dueDate,
                 selectedStudents,
-                file
-            }); 
+                visible, 
+                maxTime,  
+                maxMem, 
+                vCpu, 
+                ...(file && { file })  // Only include file if it's not null
+              });
             onClose();
         } else {
             try {
@@ -53,6 +73,10 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
             const formData = new FormData();
             formData.append('name', name);
             formData.append('dueDate', dueDate);
+            formData.append('visible', String(visible));
+            formData.append('maxTime', String(maxTime));
+            formData.append('maxCpu', String(maxMem));
+            formData.append('vCpu', String(vCpu));
             formData.append('selectedStudents', JSON.stringify(selectedStudents.map(student => student.id)));
             if (file) formData.append('file', file);
         
@@ -61,12 +85,15 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
             });
         
             onSave({
-                ...assignment,
                 name,
                 dueDate,
                 selectedStudents,
-                file
-            }); 
+                visible, 
+                maxTime,  
+                maxMem, 
+                vCpu, 
+                ...(file && { file })  // Only include file if it's not null
+            });
             onClose();
             } catch (error) {
                 console.error("Error updating assignment", error);
@@ -143,12 +170,55 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
                 <div className="modal-content">
                     <span className="close" onClick={onClose}>&times;</span>
                     <h2>Configure Assignment</h2>
-                    <input
-                        type="text"
-                        placeholder="Assignment Name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                    />
+                    <div className='data-entry'>
+                        <div className='data-row'>
+                            <label>Assignment Name</label>
+                            <input
+                                type="text"
+                                placeholder="Assignment Name"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                            />
+                        </div>
+                        <div className='data-row'>
+                            <label>Visibility: </label>
+                            <input 
+                                type="checkbox"
+                                checked={visible}
+                                onChange={(e) => setVisible(e.target.checked)}
+                            />
+                        </div>
+                        <div>
+                            <label>Max Time: </label>
+                            <input
+                                type="number"
+                                placeholder="Max Time"
+                                value={maxTime}
+                                onChange={(e) => setMaxTime(Number(e.target.value))}
+                                min={0}
+                            />
+                        </div>
+                        <div>
+                            <label>Max Memory: </label>
+                            <input
+                                type="number"
+                                placeholder="Max Memory "
+                                value={maxMem}
+                                onChange={(e) => setmaxMem(Number(e.target.value))}
+                                min={0}
+                            />
+                        </div>
+                        <div>
+                            <label>VCPU: </label>
+                            <input
+                                type="number"
+                                placeholder="number of vCPU"
+                                value={vCpu}
+                                onChange={(e) => setVCpu(Number(e.target.value))}
+                                min={0}
+                            />
+                        </div>
+                     </div>
                     <div className="student-list">
                         <Select 
                             options={students.map(student => ({

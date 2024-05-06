@@ -56,6 +56,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
     }
   };
 
+  // TODO: ADD more attributes like for the handleCreateAssignment
   const handleUpdateAssignment = (updatedAssignmentData: { name: string; dueDate: string; selectedStudents: Student[]; file?: File | undefined; }) => {
     if (selectedAssignment) {
       const updatedAssignment: Assignment = {
@@ -71,11 +72,20 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
     }
   };
 
-  const handleCreateAssignment = (assignmentData: { name: string; dueDate: string; selectedStudents: Student[]; file?: File }) => {
+  const handleCreateAssignment = (assignmentData: { 
+    name: string; 
+    dueDate: string; 
+    selectedStudents: Student[]; 
+    file?: File;
+    visible: boolean;
+    maxTime: number; 
+    maxMem: number; 
+    vCpu: number; 
+  }) => {
     const newAssignment: Assignment = {
       id: Math.max(0, ...assignments.map(a => a.id)) + 1, // Generating a new ID, handle empty list case
       ...assignmentData,
-      isPaused: false, 
+      isPaused: false,
     };
     setAssignments(prevAssignments => [...prevAssignments, newAssignment]);
   };
@@ -85,14 +95,15 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
     if (testMode) {
       // In test mode, use dummy data instead of fetching from the API
       const testAssignments: Assignment[] = [
-        { id: 1, name: "Test Assignment 1", dueDate: "2024-06-01" },
-        { id: 2, name: "Test Assignment 2", dueDate: "2024-06-02" },
-        { id: 3, name: "Test Assignment 3", dueDate: "2024-06-03" },
-        { id: 4, name: "Test Assignment 4", dueDate: "2024-06-04" },
-        { id: 5, name: "Test Assignment 5", dueDate: "2023-05-05" },
-        { id: 6, name: "Test Assignment 6", dueDate: "2023-05-05" },
+        { id: 1, name: "Test Assignment 1", dueDate: "2024-06-01", visible: true, maxTime: 0, maxMem: 0, vCpu: 0},
+        { id: 2, name: "Test Assignment 2", dueDate: "2024-06-02", visible: false, maxTime: 0, maxMem: 0, vCpu: 0},
+        { id: 3, name: "Test Assignment 3", dueDate: "2024-06-03", visible: true, maxTime: 0, maxMem: 0, vCpu: 0},
+        { id: 4, name: "Test Assignment 4", dueDate: "2024-06-04", visible: true, maxTime: 0, maxMem: 0, vCpu: 0},
+        { id: 5, name: "Test Assignment 5", dueDate: "2023-05-05", visible: true, maxTime: 0, maxMem: 0, vCpu: 0},
+        { id: 6, name: "Test Assignment 6", dueDate: "2023-05-05", visible: true, maxTime: 0, maxMem: 0, vCpu: 0},
       ];
-      setAssignments(testAssignments);
+      const filteredAssignments = role === 'student' ? testAssignments.filter(assignment => assignment.visible) : testAssignments;
+      setAssignments(filteredAssignments);
       setLoading(false);
     } else {
       const userId = getCookie();
@@ -107,7 +118,10 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
       axios
         .get(AssignmentEndpoint)
         .then((response) => {
-          setAssignments(response.data);
+          const assignmentsFromAPI = response.data;
+          // Filter out assignments with visibility=false if role is "student"
+          const filteredAssignments = role === 'student' ? assignmentsFromAPI.filter((assignment: { visible: any; }) => assignment.visible) : assignmentsFromAPI;
+          setAssignments(filteredAssignments);
           setLoading(false);
         })
         .catch((error) => {
@@ -191,11 +205,8 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
           {pagedAssignments.map((assignment) => (
             <AssignmentCell
               key={assignment.id}
-              assignmentId={assignment.id}
-              assignmentName={assignment.name}
-              dueDate={assignment.dueDate}
+              assignment={assignment}
               isPast={new Date(assignment.dueDate) < new Date()}
-              isPaused={assignment.isPaused}
               onDelete={role === "teacher" ? handleDeleteAssignment : undefined}
               onPause={
                 role === "teacher"

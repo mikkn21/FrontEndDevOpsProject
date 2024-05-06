@@ -10,7 +10,16 @@ import { Student } from '../../utils/types';
 interface InputModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (assignment: { name: string; dueDate: string; selectedStudents: Student[]; file?: File }) => void;  
+    onSave: (assignment: { 
+        name: string;
+        dueDate: string;
+        selectedStudents: Student[];
+        file?: File;
+        visible: boolean;
+        maxTime: number;
+        maxMem: number;
+        vCpu: number;
+    }) => void;  
     testMode?: boolean;
 }
 
@@ -24,6 +33,10 @@ const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMo
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<{ message: string } | null>(null);
     const [file, setFile] = useState<File | null>(null);
+    const [visible, setVisible] = useState(true); // Default to true
+    const [maxTime, setMaxTime] = useState(0); // Default to 0
+    const [maxMem, setmaxMem] = useState(0); // Default to 0
+    const [vCpu, setVCpu] = useState(0); // Default to 0
     
     const endpoint = `/api/ENDPOINT`; // Adjust URL to your actual API endpoint
 
@@ -34,6 +47,10 @@ const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMo
                 name,
                 dueDate,
                 selectedStudents,
+                visible, 
+                maxTime,  
+                maxMem, 
+                vCpu, 
                 ...(file && { file })  // Only include file if it's not null
               });
             onClose();
@@ -43,6 +60,10 @@ const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMo
                 const formData = new FormData();
                 formData.append('name', name);
                 formData.append('dueDate', dueDate);
+                formData.append('visible', String(visible));
+                formData.append('maxTime', String(maxTime));
+                formData.append('maxMem', String(maxMem));
+                formData.append('vCpu', String(vCpu));
                 formData.append('selectedStudents', JSON.stringify(selectedStudents.map(student => student.id)));
                 if (file) formData.append('file', file);
                 
@@ -55,7 +76,11 @@ const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMo
                     name,
                     dueDate,
                     selectedStudents,
-                    ...(file && { file })  // Only include file if it's not null
+                    visible,
+                    maxTime,
+                    maxMem,
+                    vCpu,
+                    ...(file && { file })
                   });
                 onClose();
             } catch (error) {
@@ -132,12 +157,55 @@ const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMo
                 <div className="modal-content">
                     <span className="close" onClick={onClose}>&times;</span>
                     <h2>Create New Assignment</h2>
-                    <input
-                        type="text"
-                        placeholder="Assignment Name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                    />
+                    <div className='data-entry'>
+                        <div className='data-row'>
+                            <label>Assignment Name</label>
+                            <input
+                                type="text"
+                                placeholder="Assignment Name"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                            />
+                        </div>
+                        <div className='data-row'>
+                            <label>Visibility: </label>
+                            <input 
+                                type="checkbox"
+                                checked={visible}
+                                onChange={(e) => setVisible(e.target.checked)}
+                            />
+                        </div>
+                        <div>
+                            <label>Max Time: </label>
+                            <input
+                                type="number"
+                                placeholder="Max Time"
+                                value={maxTime}
+                                onChange={(e) => setMaxTime(Number(e.target.value))}
+                                min={0}
+                            />
+                        </div>
+                        <div>
+                            <label>Max Memory: </label>
+                            <input
+                                type="number"
+                                placeholder="Max Memory "
+                                value={maxMem}
+                                onChange={(e) => setmaxMem(Number(e.target.value))}
+                                min={0}
+                            />
+                        </div>
+                        <div>
+                            <label>VCPU: </label>
+                            <input
+                                type="number"
+                                placeholder="number of vCPU"
+                                value={vCpu}
+                                onChange={(e) => setVCpu(Number(e.target.value))}
+                                min={0}
+                            />
+                        </div>
+                    </div>
                     <div className="student-list">
                         <Select 
                             options={students.map(student => ({
