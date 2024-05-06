@@ -4,7 +4,7 @@ import AssignmentStatus from '../AssignmentStatus/AssignmentStatus';
 import FileUploadButton from '../Button/FileUploadButton';
 import SubmitButton from '../Button/SubmitButton';
 import fileIcon from '../../assets/icons8-file.svg'
-import { AiOutlinePlayCircle, AiOutlinePauseCircle, AiOutlineDelete } from "react-icons/ai";
+import { AiOutlinePlayCircle, AiOutlinePauseCircle, AiOutlineDelete, AiOutlineSetting } from "react-icons/ai";
 
 
 
@@ -16,9 +16,10 @@ interface AssignmentCellProps {
     isPaused?: boolean;
     onPause?: () => void;
     onDelete?: (id: number) => void;
+    onConfigure?: (id: number) => void;
 }
 
-const AssignmentCell: React.FC<AssignmentCellProps> = ({ assignmentId, assignmentName, dueDate, isPast, isPaused, onPause, onDelete }) => {
+const AssignmentCell: React.FC<AssignmentCellProps> = ({ assignmentId, assignmentName, dueDate, isPast, isPaused, onPause, onDelete, onConfigure }) => {
 
     const effectiveAssignmentName = assignmentName || "Default assignment name";
 
@@ -58,6 +59,12 @@ const AssignmentCell: React.FC<AssignmentCellProps> = ({ assignmentId, assignmen
               <button className="pause-button" onClick={onPause}>
                     {isPaused ? <AiOutlinePlayCircle /> : <AiOutlinePauseCircle />}
               </button>
+            )}
+            {onConfigure && (
+              <button className="configure-button" onClick={() => onConfigure(assignmentId)}>
+                  <AiOutlineSetting />
+              </button>
+            
             )}
           </div>
           <h2>{effectiveAssignmentName}</h2>

@@ -1,72 +1,84 @@
 import React, { useState, useEffect } from 'react';
 import Select, {MultiValue, ActionMeta} from 'react-select';
-import './inputModal.css';
+import '../AssignmentAddModal/inputModal.css';
 import Button from '../Button/Button';
 import axios from "axios";
 import FileUploadButton from '../Button/FileUploadButton';
 import fileIcon from '../../assets/icons8-file.svg'
-import { Student } from '../../utils/types';
+import { Assignment, Student } from '../../utils/types';
 
 interface InputModalProps {
+    assignment: Assignment;
     isOpen: boolean;
     onClose: () => void;
-    onSave: (assignment: { name: string; dueDate: string; selectedStudents: Student[]; file?: File }) => void;  
+    onSave: (assignment: { name: string; dueDate: string; selectedStudents: Student[]; file?: File | null }) => void;  
     testMode?: boolean;
 }
 
 
-
-const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMode=false}) => {
-    const [name, setName] = useState('');
-    const [dueDate, setDueDate] = useState('');
+const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose, onSave, testMode=false}) => {
+    const [name, setName] = useState(assignment.name);
+    const [dueDate, setDueDate] = useState(assignment.dueDate);
     const [students, setStudents] = useState<Student[]>([]);
-    const [selectedStudents, setSelectedStudents] = useState<Student[]>([]); 
+    const [selectedStudents, setSelectedStudents] = useState<Student[]>(assignment.selectedStudents || []); 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<{ message: string } | null>(null);
-    const [file, setFile] = useState<File | null>(null);
-    
+    const [file, setFile] = useState<File | null>(assignment.file || null);
+
     const endpoint = `/api/ENDPOINT`; // Adjust URL to your actual API endpoint
 
-    // call to backend to send the new assignment
+
+    // Update the state when the assignment prop changes
+    useEffect(() => {
+        setName(assignment.name);
+        setDueDate(assignment.dueDate);
+        setSelectedStudents(assignment.selectedStudents || []);
+        setFile(assignment.file || null);
+    }, [assignment]);
+
+    // call to backend to send the modified assignment
     const handleSubmit = async () => {
         if (testMode) {
             onSave({
+                ...assignment,
                 name,
                 dueDate,
                 selectedStudents,
-                ...(file && { file })  // Only include file if it's not null
-              });
+                file
+            }); 
             onClose();
         } else {
             try {
-                setLoading(true);
-                const formData = new FormData();
-                formData.append('name', name);
-                formData.append('dueDate', dueDate);
-                formData.append('selectedStudents', JSON.stringify(selectedStudents.map(student => student.id)));
-                if (file) formData.append('file', file);
-                
-                // TODO: Find out if response needs to be used for anything
-                const response = await axios.post(endpoint, formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' }
-                });
-
-                onSave({
-                    name,
-                    dueDate,
-                    selectedStudents,
-                    ...(file && { file })  // Only include file if it's not null
-                  });
-                onClose();
+            setLoading(true);
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('dueDate', dueDate);
+            formData.append('selectedStudents', JSON.stringify(selectedStudents.map(student => student.id)));
+            if (file) formData.append('file', file);
+        
+            await axios.put(`${endpoint}/${assignment.id}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+        
+            onSave({
+                ...assignment,
+                name,
+                dueDate,
+                selectedStudents,
+                file
+            }); 
+            onClose();
             } catch (error) {
-                setError({ message: 'Failed to create the assignment. Please try again.' });
+                console.error("Error updating assignment", error);
+                setError({ message: "Failed to update the assignment. Please try again." });
             } finally {
-                setLoading(false);
+            setLoading(false);
             }
         }
-    };
+      };
+      
 
-    const handleStudentSelection = (
+      const handleStudentSelection = (
         selectedOptions: MultiValue<{ value: string; label: string; }>, 
         actionMeta: ActionMeta<{ value: string; label: string; }>
     ) => {
@@ -91,7 +103,7 @@ const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMo
 
 
    //backend call to get students
-    useEffect(() => {
+   useEffect(() => {
         if (testMode) {
             // Dummy test data
             setStudents([
@@ -108,7 +120,7 @@ const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMo
                 try {
                     const response = await axios.get(endpoint);
                     setStudents(response.data); 
-                  
+                
                 } catch (error) {
                     console.error('Failed to fetch students:', error);
                     setError({message : 'Failed to load students. Please try again.'});
@@ -120,7 +132,6 @@ const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMo
             }
         }
     }, [isOpen, testMode]);
-    
 
     return (
         <div className="modal">
@@ -131,7 +142,7 @@ const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMo
             ) : (
                 <div className="modal-content">
                     <span className="close" onClick={onClose}>&times;</span>
-                    <h2>Create New Assignment</h2>
+                    <h2>Configure Assignment</h2>
                     <input
                         type="text"
                         placeholder="Assignment Name"
@@ -147,6 +158,10 @@ const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMo
                             isMulti
                             placeholder='Select students...'
                             onChange={handleStudentSelection}
+                            defaultValue={selectedStudents.map(student => ({
+                                value: student.id,
+                                label: student.name
+                            }))}
                             value={selectedStudents.map(student => ({
                                 value: student.id,
                                 label: student.name
@@ -180,4 +195,4 @@ const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMo
         </div>
     )};
 
-export default InputModal;
+export default ConfigureModal;

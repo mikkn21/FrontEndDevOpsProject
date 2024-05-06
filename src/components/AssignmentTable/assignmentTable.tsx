@@ -5,14 +5,8 @@ import AssignmentCell from "../AssignmentCell/assignmentCell";
 import { getCookie, getCookieRole } from "../../utils/cookieUtils";
 import Button from "../Button/Button";
 import InputModal from "../AssignmentAddModal/inputModal";
-
-interface Assignment {
-  id: number;
-  name: string;
-  dueDate: string;
-  isPaused?: boolean;
-  // other properties...
-}
+import { Assignment, Student } from "../../utils/types";
+import ConfigureModal from "../AssignmentConfigureModal/configureModal";
 
 interface AssignmentTableProps {
   testMode?: boolean;
@@ -22,6 +16,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
   testMode = false,
 }) => {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const [filteredAssignments, setFilteredAssignments] = useState<Assignment[]>(
     []
   );
@@ -39,6 +34,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
     );
   };
 
+
   const handlePauseAssignment = (assignmentId: number) => {
     setAssignments((prevAssignments) =>
       prevAssignments.map((assignment) =>
@@ -53,17 +49,35 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
     setShowModal(true); 
   };
 
-  const handleSaveAssignment = (assignment: {
-    name: string;
-    dueDate: string;
-  }) => {
+  const handleOpenConfigureModal = (assignmentId: number) => {
+    const assignment = assignments.find(a => a.id === assignmentId);
+    if (assignment) {
+      setSelectedAssignment(assignment);
+    }
+  };
+
+  const handleUpdateAssignment = (updatedAssignmentData: { name: string; dueDate: string; selectedStudents: Student[]; file?: File | undefined; }) => {
+    if (selectedAssignment) {
+      const updatedAssignment: Assignment = {
+        ...selectedAssignment,
+        ...updatedAssignmentData
+      };
+      setAssignments(prevAssignments =>
+        prevAssignments.map(assignment =>
+          assignment.id === updatedAssignment.id ? updatedAssignment : assignment
+        )
+      );
+      setSelectedAssignment(null); // Close modal after save
+    }
+  };
+
+  const handleCreateAssignment = (assignmentData: { name: string; dueDate: string; selectedStudents: Student[]; file?: File }) => {
     const newAssignment: Assignment = {
-      id: assignments.length + 1,
-      name: assignment.name,
-      dueDate: assignment.dueDate,
-      isPaused: false, // default value
+      id: Math.max(0, ...assignments.map(a => a.id)) + 1, // Generating a new ID, handle empty list case
+      ...assignmentData,
+      isPaused: false, 
     };
-    setAssignments((prevAssignments) => [...prevAssignments, newAssignment]);
+    setAssignments(prevAssignments => [...prevAssignments, newAssignment]);
   };
 
 
@@ -89,6 +103,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
       }
       const AssignmentEndpoint = `/api/EVALUATION_SERVICE_ENDPOINT/user/${userId}`;
 
+      // get all assignments in a table
       axios
         .get(AssignmentEndpoint)
         .then((response) => {
@@ -187,6 +202,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
                   ? () => handlePauseAssignment(assignment.id)
                   : undefined
               }
+              onConfigure={role === "teacher" ? () => handleOpenConfigureModal(assignment.id) : undefined}
             />
           ))}
         </div>
@@ -207,9 +223,18 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
       <InputModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        onSave={handleSaveAssignment}
+        onSave={handleCreateAssignment}
         testMode={true}
       /> 
+      )}
+      {selectedAssignment && (
+        <ConfigureModal
+          assignment={selectedAssignment}
+          isOpen={!!selectedAssignment}
+          testMode={true}
+          onClose={() => setSelectedAssignment(null)}
+          onSave={(updatedAssignmentData) => handleUpdateAssignment({...selectedAssignment, ...updatedAssignmentData, file: updatedAssignmentData.file || undefined})}
+        />
       )}
     </div>
   );
