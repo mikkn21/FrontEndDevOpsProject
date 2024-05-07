@@ -1,0 +1,33 @@
+.headline {
+    text-decoration: underline;
+    text-align: center;
+}
+
+.submission-item {
+    cursor: pointer;
+    margin: 10px 0;
+}
+
+.submission-toggle-icon {
+    margin-right: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.submission-details {
+    padding-left: 20px;
+}
+
+.submission-header {
+    display: flex;
+    align-items: center;
+}
+
+.close-button {
+    cursor: pointer;
+    padding: 5px 10px;
+    margin-top: 20px;
+    background-color: #ccc;
+    border: none;
+    border-radius: 4px;
+}

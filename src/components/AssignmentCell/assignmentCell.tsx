@@ -7,6 +7,8 @@ import fileIcon from '../../assets/icons8-file.svg'
 import { AiOutlinePlayCircle, AiOutlinePauseCircle, AiOutlineDelete, AiOutlineSetting } from "react-icons/ai";
 import { Assignment } from '../../utils/types';
 import { getCookieRole } from '../../utils/cookieUtils';
+import ViewSubmissionsButton from '../Button/ViewSubmissionsButton';
+
 
 interface AssignmentCellProps {
     assignment : Assignment;
@@ -84,16 +86,22 @@ const AssignmentCell: React.FC<AssignmentCellProps> = ({assignment, isPast, onPa
             ) : null}
           </div>
         <div className='buttons-container'>
-          <FileUploadButton 
-            onFileUploadStatus={handleFileUpload}
-            disabled={isPast || assignment.isPaused}
-             />
-          <SubmitButton
-            fileReference={file ? file.name : ""}  // Ensure a string is always passed
-            onDataSubmit={handleDataSubmit}
-            disabled={!file || isPast || assignment.isPaused}
-            testMode={true}
-          />
+          {role === 'student' ? (
+            <>
+              <FileUploadButton 
+                onFileUploadStatus={handleFileUpload}
+                disabled={isPast || assignment.isPaused}
+              />
+              <SubmitButton
+                  fileReference={file ? file.name : ""}
+                  onDataSubmit={handleDataSubmit}
+                  disabled={!file || isPast || assignment.isPaused}
+                  testMode={true}
+              />
+            </>
+          ) : (
+              <ViewSubmissionsButton AssignmentId={assignment.id} testMode={true} />
+          )}
         </div>
       </div>
   );
