@@ -3,7 +3,7 @@ import "./registerModal.css";
 import Button from "../Button/Button";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import HashPass from "../../components/HashPass/passwordHash";
+import HashPass from "../HashPass/passwordHash";
 import { loginResponse } from "../../pages/login/login";
 
 interface RegisterModalProps {

@@ -1,8 +1,10 @@
 // SubmissionsModal.jsx
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './SubmissionsModal.css';
 import Modal from 'react-modal';
 import { Submission } from '../../utils/types';
+import { AiOutlineRedo, AiOutlineStop, AiOutlineFileZip, AiOutlineFileText } from "react-icons/ai";
+import axios from 'axios';
 
 const customStyles = {
     content: {
@@ -28,8 +30,19 @@ interface SubmissionsModalProps {
     submissions: Submission[];
 }
 
-const SubmissionsModal: React.FC<SubmissionsModalProps> = ({ isOpen, onRequestClose, submissions }) => {
+const SubmissionsModal: React.FC<SubmissionsModalProps> = ({ isOpen, onRequestClose, submissions : initialSubmissions }) => {
+    const [submissions, setSubmissions] = useState<Submission[]>(initialSubmissions);
     const [openSubmissionsIds, setOpenSubmissionsIds] = useState<Set<number>>(new Set());
+    const [loadingIds, setLoadingIds] = useState<Set<number>>(new Set());
+    const [error, setError] = useState<{ message: string } | null>(null);
+
+    const baseEndpoint = `/api/ENDPOINT`; // Adjust URL to your actual API endpoint
+
+
+    useEffect(() => {
+        setError(null);   
+        setSubmissions(initialSubmissions);
+    }, [initialSubmissions]);
 
     const toggleDetails = (id: number) => {
         setOpenSubmissionsIds(prevOpenIds => {
@@ -44,6 +57,81 @@ const SubmissionsModal: React.FC<SubmissionsModalProps> = ({ isOpen, onRequestCl
     };
 
 
+    const reevaluateSubmission = async (id: number) => {
+        setError(null); 
+        setLoadingIds(prev => new Set(prev.add(id)));
+        try {
+            // Simulate a delay of 2000 milliseconds (2 seconds)
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            const reEndpoint = `${baseEndpoint}/re/${id}`; 
+            const response = await axios.post(reEndpoint);
+            const updatedSubmission = response.data; // Assuming the response is a new submission object
+            
+            const updatedSubmissions = submissions.map(sub => {
+                if (sub.id === id) {
+                    return { ...sub, ...updatedSubmission }; 
+                }
+                return sub;
+            });
+
+            setSubmissions(updatedSubmissions);
+        } catch (error) {
+            console.error('Failed to reevaluate submission:', error);
+            setError({ message: "Failed to reevaluate the submission. Please try again." });
+        } finally {
+            setLoadingIds(prev => {
+                const newLoadingIds = new Set(prev);
+                newLoadingIds.delete(id);
+                return newLoadingIds;
+            }); 
+        }
+    };
+
+    // NOTE: that this does nost load since stopping should take priority
+    // TODO: The evaluationStatus for the backend should be changed to ERROR when the evaluation is stopped
+    const stopEvaluation = async (id: number) => {
+        setError(null);
+        try {
+            const stopEndpoint = `${baseEndpoint}/stop/${id}`; 
+            await axios.post(stopEndpoint);
+            
+            const updatedSubmissions: Submission[] = submissions.map(sub => {
+                if (sub.id === id) {
+                    return { ...sub, evaluationStatus: 'ERROR', status: 'STOPPED' }; 
+                }
+                return sub;
+            });
+            setSubmissions(updatedSubmissions);
+        } catch (error) {
+            console.error('Failed to stop submission:', error);
+            setError({ message: "Failed to stop the evaluation. Please try again." });
+        } 
+    };
+
+    // TODO: The evaluationStatus for the backend should be changed to ERROR when the evaluation is stopped
+    const stopAllEvaluations = async () => {
+        setError(null);
+        try {
+            await Promise.all(submissions.map(async (submission) => {
+                const stopEndpoint = `${baseEndpoint}/stop/${submission.id}`;
+                await axios.post(stopEndpoint);
+            }));
+    
+            const updatedSubmissions: Submission[] = submissions.map(sub => ({
+                ...sub,
+                evaluationStatus: 'ERROR', 
+                status: 'STOPPED'         
+            }));
+            setSubmissions(updatedSubmissions);
+        } catch (error) {
+            console.error('Failed to stop all submissions:', error);
+            setError({ message: "Failed to stop all evaluations. Please try again." });
+        } 
+    };
+
+
+  
     return (
         <Modal
             isOpen={isOpen}
@@ -52,14 +140,39 @@ const SubmissionsModal: React.FC<SubmissionsModalProps> = ({ isOpen, onRequestCl
             contentLabel="Submissions Modal"
         >
             <h2 className='headline'>Submissions</h2>
+            {error && <p className="error">{error.message}</p>}
             <div>
                 {submissions.map(submission => (
                     <div key={submission.id} className="submission-item">
                         <div className="submission-header" onClick={() => toggleDetails(submission.id)}>
-                            <span className="submission-toggle-icon">
-                                {openSubmissionsIds.has(submission.id) ? '▼' : '▶'}
-                            </span>
-                            {submission.studentName || 'Unnamed Student'}
+                            <div className="submission-info">  
+                                <span className="submission-toggle-icon">
+                                    {openSubmissionsIds.has(submission.id) ? '▼' : '▶'}
+                                </span>
+                                {submission.studentName || 'Unnamed Student'}
+                            </div>
+                            <div className="btn-group">
+                                <button 
+                                    title="Trigger the re-evaluation of a submission"
+                                    onClick={(e) => { e.stopPropagation(); reevaluateSubmission(submission.id); }}>
+                                    {loadingIds.has(submission.id) ? <AiOutlineRedo className="spinner" /> : <AiOutlineRedo />}
+                                </button>
+                                <button 
+                                    title="Stop the evaluation of a submission"
+                                    onClick={(e) => { e.stopPropagation(); stopEvaluation(submission.id);}}>
+                                    <AiOutlineStop />
+                                </button>
+                                <button 
+                                    title="Extract in bulk all the student’s submissions logs in a zip file"
+                                    onClick={(e) => { e.stopPropagation(); }}>
+                                    <AiOutlineFileZip />
+                                </button>
+                                <button 
+                                    title="Extract in bulk all the student’s submission metadata in a CSV file"
+                                    onClick={(e) => { e.stopPropagation(); }}>
+                                    <AiOutlineFileText />
+                                </button>
+                            </div>
                         </div>
                         {openSubmissionsIds.has(submission.id) && (
                             <div className="submission-details">
@@ -68,10 +181,15 @@ const SubmissionsModal: React.FC<SubmissionsModalProps> = ({ isOpen, onRequestCl
                                 <p>Output: {submission.output}</p>
                             </div>
                         )}
-                    </div>
+                    </div> 
                 ))}
             </div>
-            <button className="close-button" onClick={onRequestClose}>Close</button>
+            <div className="footer">
+                <button className="close-button" onClick={onRequestClose}>Close</button>
+                <button title="stop the evaluation of a submission" className="stop-button"  onClick={stopAllEvaluations}>Stop</button>
+                <button title="extract in bulk all the students’ submissions logs in a zip file" className="Extract-button" onClick={() => {}}>Logs</button>
+                <button title=" extract in bulk all the students’ submission metadata in a CSV file"className="Extract-button" onClick={() => {}}>Metadata</button>
+            </div>
         </Modal>
     );
 };

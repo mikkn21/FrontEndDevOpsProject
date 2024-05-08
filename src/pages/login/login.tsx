@@ -5,7 +5,7 @@ import "./login.css";
 import Button from "../../components/Button/Button";
 import Slideshow from "../../components/SlideShow/slideShow";
 import HashPass from "../../components/HashPass/passwordHash";
-import RegisterModal from "../../components/Register/registerModal";
+import RegisterModal from "../../components/RegisterModal/registerModal";
 import { config } from "../../config";
 
 type LoginResponse = {
