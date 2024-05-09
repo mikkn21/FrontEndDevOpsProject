@@ -1,10 +1,12 @@
-// SubmissionsModal.jsx
 import React, {useEffect, useState} from 'react';
 import './SubmissionsModal.css';
 import Modal from 'react-modal';
 import { Submission } from '../../utils/types';
 import { AiOutlineRedo, AiOutlineStop, AiOutlineFileZip, AiOutlineFileText } from "react-icons/ai";
 import axios from 'axios';
+import { convertToCSV, downloadCSV  } from '../../utils/cvsUtils';
+import { downloadLogsZip } from '../../utils/logsUtills';
+
 
 const customStyles = {
     content: {
@@ -56,6 +58,30 @@ const SubmissionsModal: React.FC<SubmissionsModalProps> = ({ isOpen, onRequestCl
         });
     };
 
+    // Extract the metadata of a single submission
+    const extractMetadata = (submission: Submission) => {
+        const submissionsArray = [submission];
+        const csvString = convertToCSV(submissionsArray);
+        const filename = `metadata_${submission.studentName}_${submission.id}.csv`;
+        downloadCSV(csvString, filename);
+    };
+
+    // Extract the metadata of all submissions
+    const extractAllMetadata = () => {
+        const csvString = convertToCSV(submissions);
+        const filename = 'all_submissions_metadata.csv';
+        downloadCSV(csvString, filename);
+    };
+
+    // Function to download logs for a single submission
+    const downloadIndividualLog = (submission: Submission) => {
+        downloadLogsZip([submission], `log_${submission.studentId}.zip`);
+    };
+
+    // Function to download logs for all submissions
+    const downloadAllLogs = () => {
+        downloadLogsZip(submissions, "all_submission_logs.zip");
+    };
 
     const reevaluateSubmission = async (id: number) => {
         setError(null); 
@@ -164,21 +190,22 @@ const SubmissionsModal: React.FC<SubmissionsModalProps> = ({ isOpen, onRequestCl
                                 </button>
                                 <button 
                                     title="Extract in bulk all the student’s submissions logs in a zip file"
-                                    onClick={(e) => { e.stopPropagation(); }}>
+                                    onClick={(e) => { e.stopPropagation(); downloadIndividualLog(submission) }}>
                                     <AiOutlineFileZip />
                                 </button>
                                 <button 
                                     title="Extract in bulk all the student’s submission metadata in a CSV file"
-                                    onClick={(e) => { e.stopPropagation(); }}>
+                                    onClick={(e) => { e.stopPropagation(); extractMetadata(submission) }}>
                                     <AiOutlineFileText />
                                 </button>
                             </div>
                         </div>
                         {openSubmissionsIds.has(submission.id) && (
                             <div className="submission-details">
+                                <p>Id: {submission.id}</p>
                                 <p>Status: {submission.status}</p>
+                                <p>Evaluation Status: {submission.evaluationStatus}</p>
                                 <p>Result: {submission.result}</p>
-                                <p>Output: {submission.output}</p>
                             </div>
                         )}
                     </div> 
@@ -187,8 +214,8 @@ const SubmissionsModal: React.FC<SubmissionsModalProps> = ({ isOpen, onRequestCl
             <div className="footer">
                 <button className="close-button" onClick={onRequestClose}>Close</button>
                 <button title="stop the evaluation of a submission" className="stop-button"  onClick={stopAllEvaluations}>Stop</button>
-                <button title="extract in bulk all the students’ submissions logs in a zip file" className="Extract-button" onClick={() => {}}>Logs</button>
-                <button title=" extract in bulk all the students’ submission metadata in a CSV file"className="Extract-button" onClick={() => {}}>Metadata</button>
+                <button title="extract in bulk all the students’ submissions logs in a zip file" className="Extract-button" onClick={downloadAllLogs}>Logs</button>
+                <button title=" extract in bulk all the students’ submission metadata in a CSV file"className="Extract-button" onClick={extractAllMetadata}>Metadata</button>
             </div>
         </Modal>
     );

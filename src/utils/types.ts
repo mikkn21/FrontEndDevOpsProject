@@ -19,9 +19,9 @@ export interface Assignment {
     file: File | undefined;
     status: 'NOT SUBMITTED' | 'SUBMITTED' | 'ERROR' | 'STOPPED'; // whether or not the student has submitted the assignment
     // TODO: Add a loading status 
-    evaluationStatus: 'SUCCESS' | 'ERROR' | null; // status of the evaluation of the submission (failed or succeeded to be evaluated) 
-    output?: string; // For storing the output of the evaluation
-    result?: string; 
+    evaluationStatus: 'SUCCESS' | 'ERROR' | 'STOPPED' | null; // status of the evaluation of the submission (failed or succeeded to be evaluated) 
+    log?: string; // For storing the logs.txt file
+    result?: string; // for storing the result.txt file
     // other properties...
   }
 

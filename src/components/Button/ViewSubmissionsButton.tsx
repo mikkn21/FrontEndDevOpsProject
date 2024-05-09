@@ -17,7 +17,7 @@ const ViewSubmissionsButton: React.FC<ViewSubmissionsButtonProps> = ({ Assignmen
     const [modalIsOpen, setIsOpen] = useState(false); 
     
 
-    const handleEvaluation = async () => {
+    const handleEvaluation = async () => { 
         if (disabled) {
             return;
         }
@@ -28,8 +28,8 @@ const ViewSubmissionsButton: React.FC<ViewSubmissionsButtonProps> = ({ Assignmen
         if (testMode) {
             // Dummy data for testing
             setSubmissions([
-                { id: 1, studentId: '1', studentName: 'John Doe', file: undefined, status: 'SUBMITTED', evaluationStatus: 'SUCCESS', output: 'Hello, World!', result: 'PASS'},
-                { id: 2, studentId: '2', studentName: 'Jane Doe', file: undefined, status: 'SUBMITTED', evaluationStatus: 'ERROR', output: 'Hello, World!', result: 'FAIL'}
+                { id: 1, studentId: '1', studentName: 'John Doe', file: undefined, status: 'SUBMITTED', evaluationStatus: 'SUCCESS', log: 'Hello, World!', result: 'PASS'},
+                { id: 2, studentId: '2', studentName: 'Jane Doe', file: undefined, status: 'SUBMITTED', evaluationStatus: 'ERROR', log: 'Hello, World!', result: 'FAIL'}
             ]);
             setLoading(false);
             setIsOpen(true); 
