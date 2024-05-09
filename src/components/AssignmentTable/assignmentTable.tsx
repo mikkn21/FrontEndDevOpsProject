@@ -5,7 +5,7 @@ import AssignmentCell from "../AssignmentCell/assignmentCell";
 import { getCookie, getCookieRole } from "../../utils/cookieUtils";
 import Button from "../Button/Button";
 import InputModal from "../AssignmentAddModal/inputModal";
-import { Assignment, Student } from "../../utils/types";
+import { Assignment, Person } from "../../utils/types";
 import ConfigureModal from "../AssignmentConfigureModal/configureModal";
 
 interface AssignmentTableProps {
@@ -57,7 +57,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
   };
 
   // TODO: ADD more attributes like for the handleCreateAssignment
-  const handleUpdateAssignment = (updatedAssignmentData: { name: string; dueDate: string; selectedStudents: Student[]; file?: File | undefined; }) => {
+  const handleUpdateAssignment = (updatedAssignmentData: { name: string; dueDate: string; selectedStudents: Person[]; file?: File | undefined; }) => {
     if (selectedAssignment) {
       const updatedAssignment: Assignment = {
         ...selectedAssignment,
@@ -75,7 +75,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
   const handleCreateAssignment = (assignmentData: { 
     name: string; 
     dueDate: string; 
-    selectedStudents: Student[]; 
+    selectedStudents: Person[]; 
     file?: File;
     visible: boolean;
     maxTime: number; 
@@ -176,6 +176,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
     (currentPage + 1) * pageSize
   );
 
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -183,6 +184,8 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
   if (error) {
     return <div>Error: {error.message}</div>;
   }
+
+
 
   return (
     <div>
@@ -222,11 +225,11 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
         <button onClick={previousPage} disabled={currentPage <= 0}>
           Previous
         </button>
-        <span>Page {currentPage + 1}</span>
+        <span> { `${currentPage + 1} of ${Math.ceil(filteredAssignments.length / pageSize)}` }</span>
         <button
           onClick={nextPage}
           disabled={(currentPage + 1) * pageSize >= filteredAssignments.length}
-        >
+         >
           Next
         </button>
       </div>

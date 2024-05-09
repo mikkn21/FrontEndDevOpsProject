@@ -3,13 +3,14 @@ import { NavLink, useNavigate } from "react-router-dom"; // Import NavLink
 import "./navBar.css";
 import logo from "../../../public/favicon.png";
 import Button from "../Button/Button";
-import { getCookieUsername } from "../../utils/cookieUtils";
+import { getCookieUsername, getCookieRole } from "../../utils/cookieUtils";
 import { loginResponse } from "../../pages/login/login";
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
 
   let username = getCookieUsername();
+  let userRole = getCookieRole();
 
   const handleLogout = () => {
     loginResponse.expires_in = 0;
@@ -33,22 +34,16 @@ const Navbar: React.FC = () => {
         >
           Home
         </NavLink>
-        <NavLink
-          to="/p1"
-          className={({ isActive }) =>
-            isActive ? "nav-item active" : "nav-item"
-          }
-        >
-          Page 1
-        </NavLink>
-        <NavLink
-          to="/p2"
-          className={({ isActive }) =>
-            isActive ? "nav-item active" : "nav-item"
-          }
-        >
-          Page 2
-        </NavLink>
+        {userRole === "admin" && (
+          <NavLink
+            to="/admin"
+            className={({ isActive }) =>
+              isActive ? "nav-item active" : "nav-item"
+            }
+          >
+            Admin
+          </NavLink>
+        )}
       </div>
       <div className="dropdown">
         <span className="username-container">

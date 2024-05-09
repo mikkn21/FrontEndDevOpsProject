@@ -5,7 +5,7 @@ import Button from '../Button/Button';
 import axios from "axios";
 import FileUploadButton from '../Button/FileUploadButton';
 import fileIcon from '../../assets/icons8-file.svg'
-import { Student } from '../../utils/types';
+import { Person, Role } from '../../utils/types';
 
 interface InputModalProps {
     isOpen: boolean;
@@ -13,7 +13,7 @@ interface InputModalProps {
     onSave: (assignment: { 
         name: string;
         dueDate: string;
-        selectedStudents: Student[];
+        selectedStudents: Person[];
         file?: File;
         visible: boolean;
         maxTime: number;
@@ -28,8 +28,8 @@ interface InputModalProps {
 const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMode=false}) => {
     const [name, setName] = useState('');
     const [dueDate, setDueDate] = useState('');
-    const [students, setStudents] = useState<Student[]>([]);
-    const [selectedStudents, setSelectedStudents] = useState<Student[]>([]); 
+    const [students, setStudents] = useState<Person[]>([]);
+    const [selectedStudents, setSelectedStudents] = useState<Person[]>([]); 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<{ message: string } | null>(null);
     const [file, setFile] = useState<File | null>(null);
@@ -99,7 +99,7 @@ const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMo
             setSelectedStudents([]);
             return;
         }
-        const selectedStudents = selectedOptions.map(option => students.find(student => student.id === option.value)).filter((student): student is Student => student !== undefined);
+        const selectedStudents = selectedOptions.map(option => students.find(student => student.id === option.value && student.role == Role.STUDENT )).filter((student): student is Person => student !== undefined);
         setSelectedStudents(selectedStudents);
     };
 
@@ -120,11 +120,11 @@ const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMo
         if (testMode) {
             // Dummy test data
             setStudents([
-                { id: '1', name: 'Alice Smith' },
-                { id: '2', name: 'Bob Johnson' },
-                { id: '3', name: 'Carol Williams' },
-                { id: '4', name: 'Dave Jones' },
-                { id: '5', name: 'Eve Brown' }
+                { id: '1', name: 'Alice Smith', role: Role.STUDENT},
+                { id: '2', name: 'Bob Johnson', role: Role.STUDENT},
+                { id: '3', name: 'Carol Williams', role: Role.STUDENT},
+                { id: '4', name: 'Dave Jones', role: Role.STUDENT},
+                { id: '5', name: 'Eve Brown', role: Role.STUDENT},
             ]);
             setLoading(false);
         } else {

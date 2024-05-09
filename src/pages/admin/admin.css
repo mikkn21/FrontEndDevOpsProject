@@ -1,0 +1,112 @@
+.tableAdmin {
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+    margin-top: 3em;
+    padding: 20px;
+}
+
+.borderAdmin {
+    border: 2px solid #5E4725;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.tableAdmin h1 {
+    margin-bottom: 0.4em;
+    align-self: center;
+}
+
+.table-headerAdmin {
+    background-color: #C2C0A2;
+    padding: 10px;
+    margin-bottom: 0.5em;
+    border-radius: 8px;
+}
+
+.control-rowAdmin {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 30px;
+}
+
+.control-rowAdmin Button {
+    font-size: 0.8rem;
+    padding: 0.5em 1em;
+    margin: 0.2em;
+}
+
+.table-content ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.table-content li {
+    padding: 10px 15px;
+    background-color: white;
+    border: 1px solid #ddd;
+    margin-top: 8px;
+    border-radius: 4px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+}
+
+.table-content li:hover {
+    background-color: #f8f8f8;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.table-content ul li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 15px;
+    background-color: white;
+    border: 1px solid #ddd;
+    margin-top: 8px;
+    border-radius: 4px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.btn-stuff button {
+    margin-left: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-stuff button:hover {
+    background-color: #f0f0f0; /* Add some visual feedback on hover */
+}
+
+
+/* Styles for error messages */
+.table-contentAdmin p {
+    color: red;
+    font-size: 14px;
+}
+
+/* Pagination controls */
+.page-controlAdmin {
+    display: flex;
+    justify-content: left;
+    gap: 3px;
+    align-items: left;
+    margin-top: 10px;
+    margin-bottom: 10px; 
+}
+
+.page-controlAdmin button {
+    display: flex;
+    justify-content: left;
+    gap: 0.3em;
+}
+
+
+
+
+
+
+

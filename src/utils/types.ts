@@ -1,8 +1,8 @@
-export interface Assignment {
+export type Assignment = {
     id: number;
     name: string;
     dueDate: string;
-    selectedStudents?: Student[]; 
+    selectedStudents?: Person[]; 
     file?: File;
     isPaused?: boolean;
     visible: boolean;
@@ -12,7 +12,7 @@ export interface Assignment {
     // other properties...
   }
 
-  export interface Submission {
+  export type Submission = {
     id: number;
     studentId: string;
     studentName: string;
@@ -25,8 +25,16 @@ export interface Assignment {
     // other properties...
   }
 
-
-export interface Student {
-    id: string; // Assuming IDs are strings
-    name: string;
+export type Person = {
+  id: string;
+  name: string;
+  role: Role;
 }
+
+
+export enum Role {
+  STUDENT = 'student',
+  TEACHER = 'teacher',
+  ADMIN = 'admin'
+}
+
