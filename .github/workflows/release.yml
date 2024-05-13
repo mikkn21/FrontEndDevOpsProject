@@ -3,10 +3,12 @@ name: Release
 on:
   push:
     branches:
-      - DISABLED
+      - main
 
 env:
   GITHUB_REGISTRY: ghcr.io
+  GOOGLE_REGISTRY: eu.gcr.io/devops-422910
+  GOOGLE_REGISTORY_NAME: devops
   GITHUB_REGISTRY_USERNAME: ${{ github.actor }}
   GITHUB_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
   IMAGE_NAME: devops-project-sdu/frontend
@@ -60,6 +62,9 @@ jobs:
           username: ${{ env.GITHUB_REGISTRY_USERNAME }}
           password: ${{ env.GITHUB_REGISTRY_PASSWORD }}
 
+      - name: Log in to Google Cloud Registry
+        uses: Devops-project-SDU/.github/actions/gcr-auth@main
+
       - name: Build docker image
         uses: docker/build-push-action@v3
         with:
@@ -75,7 +80,7 @@ jobs:
         with:
           image-tag: ${{ needs.version-and-tag.outputs.tag }}
 
-      - name: Push docker image
+      - name: Push docker image to GCR
         uses: docker/build-push-action@v3
         with:
           context: .
@@ -84,3 +89,13 @@ jobs:
           tags: |
             ${{ env.GITHUB_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.version-and-tag.outputs.tag }}
             ${{ env.GITHUB_REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Push docker image to GCR
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: linux/amd64,linux/ppc64le,linux/arm64
+          push: true
+          tags: |
+            ${{ env.GOOGLE_REGISTRY }}/${{ env.GOOGLE_REGISTORY_NAME }}/${{ env.IMAGE_NAME }}:${{ needs.version-and-tag.outputs.tag }}
+            ${{ env.GOOGLE_REGISTRY }}/${{ env.GOOGLE_REGISTORY_NAME }}/${{ env.IMAGE_NAME }}:latest
