@@ -1,7 +1,8 @@
 import Modal from 'react-modal';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import HashPassword from '../HashPass/passwordHash';
+import { Person, Role } from '../../utils/types';
 
 const customStyles = {
     content: {
@@ -23,10 +24,12 @@ const customStyles = {
 
 interface AddTeacherModalProps {
     isOpen: boolean;
+    testMode: boolean;
     onRequestClose: () => void;
+    onAddTeacher: (newTeacher: Person) => void; 
 }
 
-const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ isOpen, onRequestClose }) => {
+const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ isOpen, testMode = false, onRequestClose, onAddTeacher }) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState<{ message: string } | null>(null);
@@ -35,17 +38,29 @@ const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ isOpen, onRequestClos
 
 
     const handleRegistration = async () => {
-        // Get the hashed password to send to the backend
-        const hashedPassword = await HashPassword(password);
+        if (testMode) {
+            // If in test mode, add a teacher with a random ID
+            const newTeacher = { id: Math.random().toString(), name: username, role: Role.TEACHER };
+            onAddTeacher(newTeacher);
+            onRequestClose();
+        } else {
+            // Get the hashed password to send to the backend
+            const hashedPassword = await HashPassword(password);
 
-        try {
-        const response = await axios.post('baseEndpoint/create/teacher', {
-            username,
-            hashedPassword,
-        });
-        } catch (error) {
-            console.log("OTHER STUFF");
-            setError({ message: "An error occurred. Please try again later." });
+            try {
+            const response = await axios.post(`${baseEndpoint}/create/teacher`, {
+                username,
+                hashedPassword,
+            });
+                if (response.data) { 
+                    // Assume the response is the new teacher as a Person object 
+                    // i.e., { id: string, name: string, role: Role }
+                    onAddTeacher(response.data);  
+                    onRequestClose(); 
+                }
+            } catch (error) {
+                setError({ message: "An error occurred. Please try again later." });
+            }
         }
     };
 

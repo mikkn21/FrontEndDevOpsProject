@@ -1,36 +1,41 @@
 export type Assignment = {
     id: number;
     name: string;
-    dueDate: string;
+    teacher: string;
     selectedStudents?: Person[]; 
+    dueDate: Date;
     file?: File;
     isPaused?: boolean;
     visible: boolean;
     maxTime: number;
     maxMem: number;
     vCpu: number;
-    // other properties...
+    maxSubmissions: number;
+    StudentSubmissions: Submission[];
   }
 
   export type Submission = {
     id: number;
     studentId: string;
     studentName: string;
-    file: File | undefined;
-    status: 'NOT SUBMITTED' | 'SUBMITTED' | 'ERROR' | 'STOPPED'; // whether or not the student has submitted the assignment
-    // TODO: Add a loading status 
-    evaluationStatus: 'SUCCESS' | 'ERROR' | 'STOPPED' | null; // status of the evaluation of the submission (failed or succeeded to be evaluated) 
+    file: File;
+    evaluationStatus: 'SUCCESS' | 'ERROR' | 'STOPPED' | 'LOADING' | 'PAUSED'  | 'CANCELLED' | null; 
     log?: string; // For storing the logs.txt file
     result?: string; // for storing the result.txt file
-    // other properties...
   }
 
 export type Person = {
   id: string;
   name: string;
   role: Role;
+  status?: Status;
 }
 
+
+export enum Status { 
+  ACTIVE = 'active',
+  PAUSED = 'paused',
+}
 
 export enum Role {
   STUDENT = 'student',

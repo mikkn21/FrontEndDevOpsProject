@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../../components/NavBar/navBar';
 import axios from 'axios';
-import { Person, Role } from '../../utils/types';
+import { Person, Role, Status } from '../../utils/types';
 import './admin.css';
 import Button from '../../components/Button/Button';
 import { AiOutlineDelete, AiOutlinePauseCircle  } from "react-icons/ai";
@@ -33,13 +33,13 @@ const Admin: React.FC<AdminProps> = ({testMode = false}) => {
         setLoading(true); // Start loading
         if (testMode) {
             setStudents([
-                { id: '1', name: 'Alice', role: Role.STUDENT },
-                { id: '2', name: 'Bob', role: Role.STUDENT },
-                { id: '3', name: 'Charlie', role: Role.STUDENT },
+                { id: '1', name: 'Alice', role: Role.STUDENT, status: Status.ACTIVE},
+                { id: '2', name: 'Bob', role: Role.STUDENT, status: Status.ACTIVE},
+                { id: '3', name: 'Charlie', role: Role.STUDENT, status: Status.ACTIVE},
             ]);
             setTeachers([
-                { id: '4', name: 'David', role: Role.TEACHER },
-                { id: '5', name: 'Eve', role: Role.TEACHER },
+                { id: '4', name: 'David', role: Role.TEACHER, status: Status.PAUSED},
+                { id: '5', name: 'Eve', role: Role.TEACHER, status: Status.ACTIVE},
             ]);
             setLoading(false); // End loading
         } else {
@@ -75,20 +75,39 @@ const Admin: React.FC<AdminProps> = ({testMode = false}) => {
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
     
-    const handleDelete = async (id: string) => {
+    const handleDelete = async (id: string, isStudent: boolean) => {
         try {
-            const deleteEndpoint = `${baseEndpoint}/${id}`;
-            await axios.delete(deleteEndpoint);  
-            setStudents(prevStudents => prevStudents.filter(student => student.id !== id));
-            setTeachers(prevTeachers => prevTeachers.filter(teacher => teacher.id !== id));
+            if (isStudent) {
+                const deleteEndpoint = `${baseEndpoint}/student/${id}/delete`;
+                await axios.delete(deleteEndpoint);
+                setStudents(prevStudents => prevStudents.filter(student => student.id !== id));
+                return;
+            } else {
+                const deleteEndpoint = `${baseEndpoint}/teacher/${id}/delete`;
+                await axios.delete(deleteEndpoint);  
+                setTeachers(prevTeachers => prevTeachers.filter(teacher => teacher.id !== id));
+            }
         } catch (err) {
             console.error(err);  
             addError('Failed to delete');  
         }
     };
     
-    const handlePause = (id: string) => {
-        console.log("Pause", id);
+    const handlePause = async (id: string) => {
+        const pauseEndpoint = `${baseEndpoint}/teacher/${id}/pause`;
+        try {
+            await axios.post(pauseEndpoint);
+            setTeachers(prevTeachers => prevTeachers.map(teacher => 
+                teacher.id === id ? { ...teacher, status: Status.PAUSED } : teacher
+            ));
+        } catch (err) {
+            console.error(err);
+            addError('Failed to pause');
+        }
+    };
+
+    const handleAddTeacher = (newTeacher: Person) => {
+        setTeachers(prevTeachers => [...prevTeachers, newTeacher]);
     };
 
 
@@ -118,7 +137,7 @@ const Admin: React.FC<AdminProps> = ({testMode = false}) => {
             <div className='tableAdmin'>
                 <div className='borderAdmin'>
                     <div className="table-headerAdmin">
-                        <h1>Staff</h1>
+                        <h1>Members</h1>
                     </div>
                     <div className='table-content'>
                         <div className="control-rowAdmin">
@@ -137,14 +156,14 @@ const Admin: React.FC<AdminProps> = ({testMode = false}) => {
                         <ul>
                             {currentItems.map((person, index) => (
                                 <li key={index} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                        {person.name}
+                                        {person.name} - {person.role} {person.status === Status.PAUSED ? '(Paused)' : ''}
                                     <div className='btn-stuff'>
                                         {person.role === Role.TEACHER && (
                                             <button title='pause teacher' onClick={() => handlePause(person.id)}>
                                                 <AiOutlinePauseCircle />
                                             </button>
                                         )}
-                                        <button title='delete person' onClick={() => handleDelete(person.id)}>
+                                        <button title='delete person' onClick={() => handleDelete(person.id, person.role == Role.STUDENT)}>
                                             <AiOutlineDelete />
                                         </button>
                                     </div>
@@ -163,7 +182,12 @@ const Admin: React.FC<AdminProps> = ({testMode = false}) => {
                     </button>
                 </div>
             </div>
-            <AddTeacherModal isOpen={isModalOpen} onRequestClose={closeModal} />
+            <AddTeacherModal 
+                isOpen={isModalOpen}
+                testMode={true}
+                onRequestClose={closeModal}
+                onAddTeacher={handleAddTeacher}
+            />
         </div>
     );
 }

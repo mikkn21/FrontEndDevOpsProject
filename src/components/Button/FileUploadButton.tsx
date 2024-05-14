@@ -2,14 +2,11 @@ import React, { useRef } from "react";
 import "./Button.css";
 
 interface FileUploadButtonProps {
-  onFileUploadStatus: (status: string, file: File) => void;
+  onFileUploadStatus: (file: File) => void;
   disabled?: boolean;
 }
 
-const FileUploadButton: React.FC<FileUploadButtonProps> = ({
-  onFileUploadStatus,
-  disabled,
-}) => {
+const FileUploadButton: React.FC<FileUploadButtonProps> = ({onFileUploadStatus,disabled,}) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleButtonClick = () => {
@@ -21,7 +18,7 @@ const FileUploadButton: React.FC<FileUploadButtonProps> = ({
     if (files && files[0]) {
       console.log("File selected", files[0].name);
 
-      onFileUploadStatus("UPLOADED", files[0]);
+      onFileUploadStatus(files[0]);
 
       // !NOTE: All of this is for sending data to the micoservice that will handle the file
       // const formData = new FormData();

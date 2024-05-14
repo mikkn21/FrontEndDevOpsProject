@@ -2,24 +2,21 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./assignmentTable.css";
 import AssignmentCell from "../AssignmentCell/assignmentCell";
-import { getCookie, getCookieRole } from "../../utils/cookieUtils";
+import { getCookie, getCookieRole, getCookieId } from "../../utils/cookieUtils";
 import Button from "../Button/Button";
 import InputModal from "../AssignmentAddModal/inputModal";
-import { Assignment, Person } from "../../utils/types";
+import { Assignment, Person, Submission } from "../../utils/types";
 import ConfigureModal from "../AssignmentConfigureModal/configureModal";
+
 
 interface AssignmentTableProps {
   testMode?: boolean;
 }
 
-const AssignmentTable: React.FC<AssignmentTableProps> = ({
-  testMode = false,
-}) => {
+const AssignmentTable: React.FC<AssignmentTableProps> = ({testMode = false,}) => {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
-  const [filteredAssignments, setFilteredAssignments] = useState<Assignment[]>(
-    []
-  );
+  const [filteredAssignments, setFilteredAssignments] = useState<Assignment[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -27,7 +24,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
   const pageSize = 2; // Number of assignments per page
 
   const role = getCookieRole();
-
+  
   const handleDeleteAssignment = (assignmentId: number) => {
     setAssignments((prevAssignments) =>
       prevAssignments.filter((a) => a.id !== assignmentId)
@@ -55,52 +52,51 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
       setSelectedAssignment(assignment);
     }
   };
-
-  // TODO: ADD more attributes like for the handleCreateAssignment
-  const handleUpdateAssignment = (updatedAssignmentData: { name: string; dueDate: string; selectedStudents: Person[]; file?: File | undefined; }) => {
-    if (selectedAssignment) {
-      const updatedAssignment: Assignment = {
-        ...selectedAssignment,
-        ...updatedAssignmentData
-      };
-      setAssignments(prevAssignments =>
-        prevAssignments.map(assignment =>
-          assignment.id === updatedAssignment.id ? updatedAssignment : assignment
-        )
-      );
-      setSelectedAssignment(null); // Close modal after save
-    }
+  
+  const handleUpdateAssignment = (updatedAssignment: Assignment) => {
+    setAssignments(prevAssignments =>
+      prevAssignments.map(assignment =>
+        assignment.id === updatedAssignment.id ? updatedAssignment : assignment
+      )
+    );
+    setSelectedAssignment(null);
   };
 
-  const handleCreateAssignment = (assignmentData: { 
+
+  const handleCreateAssignment = (modalData: {
     name: string; 
     dueDate: string; 
     selectedStudents: Person[]; 
-    file?: File;
-    visible: boolean;
+    file?: File; 
+    visible: boolean; 
     maxTime: number; 
     maxMem: number; 
     vCpu: number; 
+    maxSubmissions: number;
   }) => {
+    const newId = Math.max(0, ...assignments.map(a => a.id)) + 1;
+  
     const newAssignment: Assignment = {
-      id: Math.max(0, ...assignments.map(a => a.id)) + 1, // Generating a new ID, handle empty list case
-      ...assignmentData,
+      ...modalData,
+      id: newId,
       isPaused: false,
+      StudentSubmissions: [],
+      teacher: ""
     };
+  
     setAssignments(prevAssignments => [...prevAssignments, newAssignment]);
   };
-
 
   useEffect(() => {
     if (testMode) {
       // In test mode, use dummy data instead of fetching from the API
       const testAssignments: Assignment[] = [
-        { id: 1, name: "Test Assignment 1", dueDate: "2024-06-01", visible: true, maxTime: 0, maxMem: 0, vCpu: 0},
-        { id: 2, name: "Test Assignment 2", dueDate: "2024-06-02", visible: false, maxTime: 0, maxMem: 0, vCpu: 0},
-        { id: 3, name: "Test Assignment 3", dueDate: "2024-06-03", visible: true, maxTime: 0, maxMem: 0, vCpu: 0},
-        { id: 4, name: "Test Assignment 4", dueDate: "2024-06-04", visible: true, maxTime: 0, maxMem: 0, vCpu: 0},
-        { id: 5, name: "Test Assignment 5", dueDate: "2023-05-05", visible: true, maxTime: 0, maxMem: 0, vCpu: 0},
-        { id: 6, name: "Test Assignment 6", dueDate: "2023-05-05", visible: true, maxTime: 0, maxMem: 0, vCpu: 0},
+        {id: 1, name: "Test Assignment 1", dueDate: new Date("2024-06-01"), visible: true, maxTime: 0, maxMem: 0, vCpu: 0, maxSubmissions: 2, StudentSubmissions: [],teacher: ""},
+        {id: 2, name: "Test Assignment 2", dueDate: new Date("2024-06-02"), visible: false, maxTime: 0, maxMem: 0, vCpu: 0, maxSubmissions: 2, StudentSubmissions: [],teacher: ""},
+        {id: 3, name: "Test Assignment 3", dueDate: new Date("2024-06-03"), visible: true, maxTime: 0, maxMem: 0, vCpu: 0, maxSubmissions: 2, StudentSubmissions: [],teacher: ""},
+        {id: 4, name: "Test Assignment 4", dueDate: new Date("2024-06-04"), visible: true, maxTime: 0, maxMem: 0, vCpu: 0, maxSubmissions: 2, StudentSubmissions: [],teacher: ""},
+        {id: 5, name: "Test Assignment 5", dueDate: new Date("2023-05-05"), visible: true, maxTime: 0, maxMem: 0, vCpu: 0, maxSubmissions: 2, StudentSubmissions: [],teacher: ""},
+        {id: 6, name: "Test Assignment 6", dueDate: new Date("2023-05-05"), visible: true, maxTime: 0, maxMem: 0, vCpu: 0, maxSubmissions: 2, StudentSubmissions: [], teacher: ""}
       ];
       const filteredAssignments = role === 'student' ? testAssignments.filter(assignment => assignment.visible) : testAssignments;
       setAssignments(filteredAssignments);
@@ -112,11 +108,11 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
         setLoading(false);
         return;
       }
-      const AssignmentEndpoint = `/api/EVALUATION_SERVICE_ENDPOINT/user/${userId}`;
-
+      const baseEndpoint = `/api/ENDPOINT`; // Adjust URL to your actual API endpoint
+      
       // get all assignments in a table
       axios
-        .get(AssignmentEndpoint)
+        .get(`${baseEndpoint}/assignments/${userId}`)
         .then((response) => {
           const assignmentsFromAPI = response.data;
           // Filter out assignments with visibility=false if role is "student"
@@ -217,6 +213,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
                   : undefined
               }
               onConfigure={role === "teacher" ? () => handleOpenConfigureModal(assignment.id) : undefined}
+              studentId={role === "student" ? getCookieId() ?? undefined : undefined}
             />
           ))}
         </div>

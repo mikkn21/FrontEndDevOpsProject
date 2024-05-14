@@ -5,7 +5,7 @@ import Button from '../Button/Button';
 import axios from "axios";
 import FileUploadButton from '../Button/FileUploadButton';
 import fileIcon from '../../assets/icons8-file.svg'
-import { Assignment, Student } from '../../utils/types';
+import { Assignment, Person, Role, Status } from '../../utils/types';
 
 interface InputModalProps {
     assignment: Assignment;
@@ -13,13 +13,14 @@ interface InputModalProps {
     onClose: () => void;
     onSave: (assignment: { 
         name: string;
-        dueDate: string;
-        selectedStudents: Student[];
+        dueDate: Date;
+        selectedStudents: Person[];
         file?: File;
         visible: boolean;
         maxTime: number;
         maxMem: number;
         vCpu: number;
+        maxSubmissions: number;
     }) => void; 
     testMode?: boolean;
 }
@@ -27,9 +28,9 @@ interface InputModalProps {
 
 const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose, onSave, testMode=false}) => {
     const [name, setName] = useState(assignment.name);
-    const [dueDate, setDueDate] = useState(assignment.dueDate);
-    const [students, setStudents] = useState<Student[]>([]);
-    const [selectedStudents, setSelectedStudents] = useState<Student[]>(assignment.selectedStudents || []); 
+    const [dueDate, setDueDate] = useState<Date>(new Date(assignment.dueDate));
+    const [students, setStudents] = useState<Person[]>([]);
+    const [selectedStudents, setSelectedStudents] = useState<Person[]>(assignment.selectedStudents || []); 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<{ message: string } | null>(null);
     const [file, setFile] = useState<File | null>(assignment.file || null);
@@ -37,6 +38,7 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
     const [maxTime, setMaxTime] = useState(0); // Default to 0
     const [maxMem, setmaxMem] = useState(0); // Default to 0
     const [vCpu, setVCpu] = useState(0); // Default to 0
+    const [maxSubmissions, setMaxSubmissions] = useState(2); // Default to 2
 
     const endpoint = `/api/ENDPOINT`; // Adjust URL to your actual API endpoint
 
@@ -44,11 +46,12 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
     // Update the state when the assignment prop changes
     useEffect(() => {
         setName(assignment.name);
-        setDueDate(assignment.dueDate);
+        setDueDate(new Date(assignment.dueDate));
         setVisible(assignment.visible);
         setMaxTime(assignment.maxTime);
         setmaxMem(assignment.maxMem);
         setVCpu(assignment.vCpu);
+        setMaxSubmissions(assignment.maxSubmissions);
         setSelectedStudents(assignment.selectedStudents || []);
         setFile(assignment.file || null);
     }, [assignment]);
@@ -64,6 +67,7 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
                 maxTime,  
                 maxMem, 
                 vCpu, 
+                maxSubmissions,
                 ...(file && { file })  // Only include file if it's not null
               });
             onClose();
@@ -72,11 +76,12 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
             setLoading(true);
             const formData = new FormData();
             formData.append('name', name);
-            formData.append('dueDate', dueDate);
+            formData.append('dueDate', dueDate.toString());
             formData.append('visible', String(visible));
             formData.append('maxTime', String(maxTime));
             formData.append('maxCpu', String(maxMem));
             formData.append('vCpu', String(vCpu));
+            formData.append('maxSubmissions', String(maxSubmissions));
             formData.append('selectedStudents', JSON.stringify(selectedStudents.map(student => student.id)));
             if (file) formData.append('file', file);
         
@@ -92,6 +97,7 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
                 maxTime,  
                 maxMem, 
                 vCpu, 
+                maxSubmissions,
                 ...(file && { file })  // Only include file if it's not null
             });
             onClose();
@@ -113,11 +119,11 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
             setSelectedStudents([]);
             return;
         }
-        const selectedStudents = selectedOptions.map(option => students.find(student => student.id === option.value)).filter((student): student is Student => student !== undefined);
+        const selectedStudents = selectedOptions.map(option => students.find(student => student.id === option.value)).filter((student): student is Person => student !== undefined);
         setSelectedStudents(selectedStudents);
     };
 
-    const handleFileUpload = (newStatus: string, uploadedFile: File) => {
+    const handleFileUpload = (uploadedFile: File) => {
         setFile(uploadedFile);
       };
   
@@ -134,11 +140,11 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
         if (testMode) {
             // Dummy test data
             setStudents([
-                { id: '1', name: 'Alice Smith' },
-                { id: '2', name: 'Bob Johnson' },
-                { id: '3', name: 'Carol Williams' },
-                { id: '4', name: 'Dave Jones' },
-                { id: '5', name: 'Eve Brown' }
+                { id: '1', name: 'Alice Smith', role: Role.STUDENT, status: Status.ACTIVE},
+                { id: '2', name: 'Bob Johnson', role: Role.STUDENT, status: Status.ACTIVE},
+                { id: '3', name: 'Carol Williams', role: Role.STUDENT, status: Status.ACTIVE},
+                { id: '4', name: 'Dave Jones', role: Role.STUDENT, status: Status.ACTIVE},
+                { id: '5', name: 'Eve Brown', role: Role.STUDENT, status: Status.ACTIVE},
             ]);
             setLoading(false);
         } else {
@@ -188,7 +194,7 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
                                 onChange={(e) => setVisible(e.target.checked)}
                             />
                         </div>
-                        <div>
+                        <div className='data-row'>
                             <label>Max Time: </label>
                             <input
                                 type="number"
@@ -198,7 +204,7 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
                                 min={0}
                             />
                         </div>
-                        <div>
+                        <div className='data-row'>
                             <label>Max Memory: </label>
                             <input
                                 type="number"
@@ -208,7 +214,7 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
                                 min={0}
                             />
                         </div>
-                        <div>
+                        <div className='data-row'>
                             <label>VCPU: </label>
                             <input
                                 type="number"
@@ -216,6 +222,17 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
                                 value={vCpu}
                                 onChange={(e) => setVCpu(Number(e.target.value))}
                                 min={0}
+                            />
+                        </div>
+                        <div className='data-row'>
+                            <label>Max submissions for each student: </label>
+                            <input
+                                type="number"
+                                placeholder="maximum number of assignment submissions"
+                                value={maxSubmissions}
+                                onChange={(e) => setMaxSubmissions(Number(e.target.value))}
+                                min={1}
+                                max={3}
                             />
                         </div>
                      </div>
@@ -241,8 +258,8 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
                     <div className='date-row'>
                         <input
                             type="date"
-                            value={dueDate}
-                            onChange={(e) => setDueDate(e.target.value)}
+                            value={dueDate.toString()}
+                            onChange={(e) => setDueDate(new Date(e.target.value))}
                         />
                     </div>
                     <div className='file-row'>

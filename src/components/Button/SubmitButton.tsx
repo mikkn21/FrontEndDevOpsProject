@@ -1,46 +1,18 @@
 import React from 'react';
-import axios from 'axios';
 import Button from './Button';
 
 interface SubmitButtonProps {
-  fileReference: string;  // Maybe this is a ID or token given back when the FileUploadButton have called its microservice
-  onDataSubmit: (result: 'SUCCESS' | 'ERROR') => void;
-  disabled?: boolean
-  testMode? : boolean; 
+    onClick: () => void;  
+    disabled?: boolean;
+    loading?: boolean;
 }
 
-const SubmitButton: React.FC<SubmitButtonProps> = ({ fileReference, onDataSubmit, disabled, testMode = false }) => {
-  const handleEvaluation = () => {
-    if (disabled) {
-      return;
-    }
-
-    const evaluationEndpoint = `/api/EVALUATION_SERVICE_ENDPOINT/${fileReference}`;
-
-    if (testMode) {
-      console.log('Test mode enabled. Skipping evaluation');
-      onDataSubmit('ERROR');
-
-    } else {
-      axios.post(evaluationEndpoint, { /* If we need to send additional data */ })
-        .then(response => {
-          console.log('Evaluation successful', response.data);
-          onDataSubmit('SUCCESS');
-        })
-        .catch(error => {
-          console.error('Evaluation failed', error);
-          onDataSubmit('ERROR');
-        });
-    }
-
-  };
-
-
-  return (
-    <Button onClick={handleEvaluation} disabled={disabled}>
-      Submit
-    </Button>
-  );
+const SubmitButton: React.FC<SubmitButtonProps> = ({ onClick, disabled, loading }) => {
+    return (
+        <Button onClick={onClick} disabled={disabled || loading}>
+           {loading ? 'Loading...' : 'Submit'}
+        </Button>
+    );
 };
 
 export default SubmitButton;

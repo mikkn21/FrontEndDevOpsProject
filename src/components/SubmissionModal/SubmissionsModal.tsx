@@ -203,7 +203,6 @@ const SubmissionsModal: React.FC<SubmissionsModalProps> = ({ isOpen, onRequestCl
                         {openSubmissionsIds.has(submission.id) && (
                             <div className="submission-details">
                                 <p>Id: {submission.id}</p>
-                                <p>Status: {submission.status}</p>
                                 <p>Evaluation Status: {submission.evaluationStatus}</p>
                                 <p>Result: {submission.result}</p>
                             </div>

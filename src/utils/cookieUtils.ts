@@ -8,6 +8,10 @@ export function getCookieRole(): string | null {
   return extractCookieInformation(2);
 }
 
+export function getCookieId(): string | null {
+  return extractCookieInformation(3);
+}
+
 function extractCookieInformation(i: number): string | null {
   const authToken = loginResponse.token;
   if (authToken) {

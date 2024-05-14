@@ -37,7 +37,8 @@ const LoginPage: React.FC = () => {
     // ADMIN login that can be used to bypass the authentication
     if (username === "ADMIN" && password === "ADMIN") {
       const role = "admin";
-      const tokenValue = `${"authToken"}|${username}|${role}`;
+      const id = "12";
+      const tokenValue = `${"authToken"}|${username}|${role}|${id}`;
       Object.assign(loginResponse, {
         token: tokenValue,
         expires_in: 1,
@@ -50,7 +51,8 @@ const LoginPage: React.FC = () => {
     // STUDENT login
     if (username === "student" && password === "student") {
       const role = "student";
-      const tokenValue = `${"authToken"}|${username}|${role}`;
+      const iD = "123456";
+      const tokenValue = `${"authToken"}|${username}|${role}|${iD}`;
       Object.assign(loginResponse, {
         token: tokenValue,
         expires_in: 1,
@@ -62,7 +64,8 @@ const LoginPage: React.FC = () => {
     // TEACHER login
     if (username === "teacher" && password === "teacher") {
       const role = "teacher";
-      const tokenValue = `${"authToken"}|${username}|${role}`;
+      const id = "555";
+      const tokenValue = `${"authToken"}|${username}|${role}|${id}`;
       Object.assign(loginResponse, {
         token: tokenValue,
         expires_in: 1,

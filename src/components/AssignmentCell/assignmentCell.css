@@ -44,27 +44,50 @@
 
 
 .file-info {
-  min-height: 50px;  
   display: flex;
-  align-items: center;
-  justify-content: center;  
-  background: #f8f8f8; 
+  flex-direction: column; 
+  align-items: flex-start; 
+  justify-content: center;
+  background: #f8f8f8;
   margin: 10px 0;
-  padding: 0 10px;  
-  position: relative; /* This line is crucial for correct positioning of the remove-file button */
+  padding: 0 10px;
+  position: relative;
+}
+
+.file-entry {
+  flex-direction: column;  
+  align-items: flex-start; 
+}
+
+.file-details {
+  display: flex;
+  margin-top: 5px;      
+}
+
+.status-file {
+  font-weight: bold;  
+}
+
+.file-info > div {
+  display: flex;
+  width: 100%;
+  position: relative; 
+  margin: 5px 0; 
 }
 
 .file-icon {
-  width: 28px; 
-  height: 28px;
-  margin-right: 6px; /* Space between icon and filename */
+  width: 33px; 
+  height: 33px;
+  margin-right: 6px;
+  padding-top: 6px;
 }
 
 .remove-file {
   display: none;
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 50%; 
+  right: 10px; 
+  transform: translateY(-50%);
   cursor: pointer;
   font-size: 20px;
   background: #ccc;
@@ -72,8 +95,8 @@
   padding: 0 5px;
 }
 
-.file-info:hover .remove-file {
-  display: block;
+.file-info > div:hover .remove-file {
+  display: block; 
 }
 
 p {
