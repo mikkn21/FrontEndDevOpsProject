@@ -67,7 +67,6 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/ppc64le,linux/arm64
           push: false
           load: true
           build-args: VERSION=v${{ needs.version-and-tag.outputs.tag }}
