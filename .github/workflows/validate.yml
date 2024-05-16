@@ -1,9 +1,9 @@
-name: Release
+name: Validate
 
 on:
-  push:
+  pull_request:
     branches:
-      - DISABLE
+      - main
 
 env:
   GITHUB_REGISTRY: ghcr.io
@@ -86,19 +86,6 @@ jobs:
           project_id: devops-422910
           image_name: ${{ env.GOOGLE_REGISTRY_NAME }}/${{ env.IMAGE_NAME }}
           image_tag: ${{ needs.version-and-tag.outputs.tag }}, latest
-
-      - name: install the gcloud cli
-        uses: google-github-actions/setup-gcloud@v0
-        with:
-          project_id: devops-422910
-          service_account_key: ${{ secrets.GKE_GSA_DEVELOPER }}
-          install_components: "gke-gcloud-auth-plugin"
-          export_default_credentials: true
-
-      - name: Deploy to gke
-        run: |
-          gcloud container clusters get-credentials devops --region=europe-west2
-          kubectl set image deployment/frontend frontend=${{ env.GOOGLE_REGISTRY }}/devops-422910/${{ env.IMAGE_NAME }}:${{ needs.version-and-tag }} -n frontend
 
       - name: Push docker image to GHCR
         uses: docker/build-push-action@v3
