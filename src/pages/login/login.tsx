@@ -79,37 +79,46 @@ const LoginPage: React.FC = () => {
     // Get the hashed password to send to the backend
     const hashedPassword = await HashPass(password);
 
-    try {
-      const response = await axios.post(endpoint, {
-        username,
-        hashedPassword,
-      });
-
-      if (response.status === 200 && response.data.token) {
-        // Expires in should be reduced to the number of days? Which is fucked as we want to specify something like seconds.
-        // can just be converted to 0.xx days?
-        Object.assign(loginResponse, {
-          //?
+    const refreshToken = async () => {
+      try {
+        const response = await axios.post(endpoint, {
+          username,
+          hashedPassword,
         });
-        navigate("/");
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const status = error.response?.status;
-        if (status === 400) {
-          // Handle Bad Request
-          setError("try again something went wrong");
-        } else if (status === 404) {
-          // Handle Not Found
-          setError("invalid username or password");
-        } else {
-          setError("An error occurred. Please try again later.");
+
+        if (response.status === 200 && response.data.token) {
+          // Expires in should be reduced to the number of days? Which is fucked as we want to specify something like seconds.
+          // can just be converted to 0.xx days?
+          const initialLogin = loginResponse;
+          Object.assign(loginResponse, {
+            //?
+          });
+
+          // if was not logged in at first, navigate the user
+          if (initialLogin.token === "") {
+            navigate("/");
+          }
         }
-      } else {
-        // Handle non-Axios errors
-        setError("An unexpected error occurred. Please try again later.");
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          const status = error.response?.status;
+          if (status === 400) {
+            // Handle Bad Request
+            setError("try again something went wrong");
+          } else if (status === 404) {
+            // Handle Not Found
+            setError("invalid username or password");
+          } else {
+            setError("An error occurred. Please try again later.");
+          }
+        } else {
+          // Handle non-Axios errors
+          setError("An unexpected error occurred. Please try again later.");
+        }
       }
-    }
+    };
+    refreshToken();
+    setInterval(refreshToken, 1000 * 60); // 10 minutes
   };
 
   return (
