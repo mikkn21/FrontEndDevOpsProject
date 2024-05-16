@@ -3,6 +3,9 @@ name: Release
 on:
   push:
     branches:
+      - DISABLE
+  pull_request:
+    branches:
       - main
 
 env:
