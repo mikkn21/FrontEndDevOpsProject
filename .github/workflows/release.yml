@@ -7,8 +7,8 @@ on:
 
 env:
   GITHUB_REGISTRY: ghcr.io
-  GOOGLE_REGISTRY: eu.gcr.io/devops-422910
-  GOOGLE_REGISTORY_NAME: devops
+  GOOGLE_REGISTRY: europe-west2-docker.pkg.dev
+  GOOGLE_REGISTRY_NAME: devops
   GITHUB_REGISTRY_USERNAME: ${{ github.actor }}
   GITHUB_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
   IMAGE_NAME: devops-project-sdu/frontend
@@ -62,14 +62,12 @@ jobs:
           username: ${{ env.GITHUB_REGISTRY_USERNAME }}
           password: ${{ env.GITHUB_REGISTRY_PASSWORD }}
 
-      - name: Log in to Google Cloud Registry
-        uses: Devops-project-SDU/.github/actions/gcr-auth@main
-
       - name: Build docker image
         uses: docker/build-push-action@v3
         with:
           context: .
           file: ./Dockerfile
+          platforms: linux/amd64,linux/ppc64le,linux/arm64
           push: false
           load: true
           build-args: VERSION=v${{ needs.version-and-tag.outputs.tag }}
@@ -80,7 +78,30 @@ jobs:
         with:
           image-tag: ${{ needs.version-and-tag.outputs.tag }}
 
-      - name: Push docker image to GCR
+      - name: Push Docker image to GCR
+        uses: RafikFarhad/push-to-gcr-github-action@v5-rc1
+        with:
+          context: .
+          gcloud_service_key: ${{ secrets.GKE_GSA_GCR_ACCESSOR }}
+          registry: ${{ env.GOOGLE_REGISTRY }}
+          project_id: devops-422910
+          image_name: ${{ env.GOOGLE_REGISTRY_NAME }}/${{ env.IMAGE_NAME }}
+          image_tag: ${{ needs.version-and-tag.outputs.tag }}, latest
+
+      - name: install the gcloud cli
+        uses: google-github-actions/setup-gcloud@v0
+        with:
+          project_id: devops-422910
+          service_account_key: ${{ secrets.GKE_GSA_DEVELOPER }}
+          install_components: "gke-gcloud-auth-plugin"
+          export_default_credentials: true
+
+      - name: Deploy to gke
+        run: |
+          gcloud container clusters get-credentials devops --region=europe-west2
+          kubectl set image deployment/frontend frontend=${{ env.GOOGLE_REGISTRY }}/devops-422910/${{ env.IMAGE_NAME }}:${{ needs.version-and-tag }} -n frontend
+
+      - name: Push docker image to GHCR
         uses: docker/build-push-action@v3
         with:
           context: .
@@ -89,13 +110,3 @@ jobs:
           tags: |
             ${{ env.GITHUB_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.version-and-tag.outputs.tag }}
             ${{ env.GITHUB_REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-
-      - name: Push docker image to GCR
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          platforms: linux/amd64,linux/ppc64le,linux/arm64
-          push: true
-          tags: |
-            ${{ env.GOOGLE_REGISTRY }}/${{ env.GOOGLE_REGISTORY_NAME }}/${{ env.IMAGE_NAME }}:${{ needs.version-and-tag.outputs.tag }}
-            ${{ env.GOOGLE_REGISTRY }}/${{ env.GOOGLE_REGISTORY_NAME }}/${{ env.IMAGE_NAME }}:latest
