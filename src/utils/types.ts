@@ -18,7 +18,7 @@ export type Assignment = {
     id: number;
     studentId: string;
     studentName: string;
-    file: File;
+    file?: File;
     evaluationStatus: 'SUCCESS' | 'ERROR' | 'STOPPED' | 'LOADING' | 'PAUSED'  | 'CANCELLED' | null; 
     log?: string; // For storing the logs.txt file
     result?: string; // for storing the result.txt file

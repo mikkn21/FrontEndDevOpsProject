@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Select, {MultiValue, ActionMeta} from 'react-select';
+import Select, {MultiValue} from 'react-select';
 import '../AssignmentAddModal/inputModal.css';
 import Button from '../Button/Button';
 import axios from "axios";
@@ -113,7 +113,6 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
 
       const handleStudentSelection = (
         selectedOptions: MultiValue<{ value: string; label: string; }>, 
-        actionMeta: ActionMeta<{ value: string; label: string; }>
     ) => {
         if (!selectedOptions) {
             setSelectedStudents([]);

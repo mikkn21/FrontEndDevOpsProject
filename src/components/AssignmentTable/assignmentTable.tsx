@@ -5,7 +5,7 @@ import AssignmentCell from "../AssignmentCell/assignmentCell";
 import { getCookie, getCookieRole, getCookieId } from "../../utils/cookieUtils";
 import Button from "../Button/Button";
 import InputModal from "../AssignmentAddModal/inputModal";
-import { Assignment, Person, Submission } from "../../utils/types";
+import { Assignment, Person } from "../../utils/types";
 import ConfigureModal from "../AssignmentConfigureModal/configureModal";
 
 
@@ -25,6 +25,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({testMode = false,}) =>
 
   const role = getCookieRole();
   
+  // TODO: Needs to make a backend call to delete the assignment
   const handleDeleteAssignment = (assignmentId: number) => {
     setAssignments((prevAssignments) =>
       prevAssignments.filter((a) => a.id !== assignmentId)
@@ -32,6 +33,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({testMode = false,}) =>
   };
 
 
+  // TODO: Needs to make a backend call to pause the assignment
   const handlePauseAssignment = (assignmentId: number) => {
     setAssignments((prevAssignments) =>
       prevAssignments.map((assignment) =>
@@ -53,6 +55,8 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({testMode = false,}) =>
     }
   };
   
+
+  // TODO: Needs to make a backend call to update the assignment
   const handleUpdateAssignment = (updatedAssignment: Assignment) => {
     setAssignments(prevAssignments =>
       prevAssignments.map(assignment =>
@@ -62,10 +66,10 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({testMode = false,}) =>
     setSelectedAssignment(null);
   };
 
-
+  // TODO: Needs to make a backend call to create the assignment
   const handleCreateAssignment = (modalData: {
     name: string; 
-    dueDate: string; 
+    dueDate: Date; 
     selectedStudents: Person[]; 
     file?: File; 
     visible: boolean; 
@@ -81,12 +85,15 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({testMode = false,}) =>
       id: newId,
       isPaused: false,
       StudentSubmissions: [],
-      teacher: ""
+      teacher: "",
+      dueDate: new Date(modalData.dueDate) // Convert the dueDate string to a Date object
     };
   
     setAssignments(prevAssignments => [...prevAssignments, newAssignment]);
   };
 
+
+  // When the component mounts, fetch the assignments
   useEffect(() => {
     if (testMode) {
       // In test mode, use dummy data instead of fetching from the API
@@ -128,6 +135,8 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({testMode = false,}) =>
     }
   }, [testMode]); // Depend on testMode to re-run the effect when it changes
 
+
+  // Filter assignments based on due date
   useEffect(() => {
     // After fetching, apply filter initially to show current assignments
     const now = new Date();
@@ -139,7 +148,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({testMode = false,}) =>
     setCurrentPage(0);
   }, [assignments]);
 
-  // Add methods to filter assignments
+  
   const showCurrent = () => {
     const now = new Date();
     setFilteredAssignments(

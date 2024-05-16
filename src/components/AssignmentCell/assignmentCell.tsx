@@ -73,36 +73,45 @@ const AssignmentCell: React.FC<AssignmentCellProps> = ({ assignment, isPast, onP
           setSubmitted(true);
       }, 2500);
       } else {
-        const formData = new FormData();
-        formData.append("file", fileToSubmit.file);
+        if (fileToSubmit.file) {
+          const formData = new FormData();
+          formData.append("file", fileToSubmit.file);
 
-        // Optional: Append additional data if needed
-        formData.append("assignmentId", String(assignment.id));
-        if (studentId) {
-          formData.append("studentId", studentId);
-        }
-    
-        try {
-            setLoading(true); 
-            const response = await axios.post(`${baseEndpoint}/submit/`, formData, {
+          // Optional: Append additional data if needed
+          formData.append("assignmentId", String(assignment.id));
+          if (studentId) {
+            formData.append("studentId", studentId);
+          }
+      
+          try {
+              setLoading(true); 
+              // const response = await axios.post(`${baseEndpoint}/submit/`, formData, {
+              //     headers: {
+              //         'Content-Type': 'multipart/form-data',
+              //     }
+              // });
+              await axios.post(`${baseEndpoint}/submit/`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 }
             });
-            const currentFiles = filesRef.current;
-            if (!currentFiles.some(f => f.file === fileToSubmit.file)) {
-                
-                return; // Submission has been cancelled , do not update state
-            }
+              const currentFiles = filesRef.current;
+              if (!currentFiles.some(f => f.file === fileToSubmit.file)) {
+                  
+                  return; // Submission has been cancelled , do not update state
+              }
 
-            setFiles(prevFiles => prevFiles.map(f => f.file === fileToSubmit.file ? { ...f, evaluationStatus: 'SUCCESS' } : f));
-            setCanUploadMore(true);
-            setSubmitted(true);
-        } catch (error) {
-          console.error('Error uploading file:', error);
-          setFiles(prevFiles => prevFiles.map(f => f.file === fileToSubmit.file ? {...f, evaluationStatus: 'ERROR'} : f));
-        } finally {
-            setLoading(false); 
+              setFiles(prevFiles => prevFiles.map(f => f.file === fileToSubmit.file ? { ...f, evaluationStatus: 'SUCCESS' } : f));
+              setCanUploadMore(true);
+              setSubmitted(true);
+          } catch (error) {
+            console.error('Error uploading file:', error);
+            setFiles(prevFiles => prevFiles.map(f => f.file === fileToSubmit.file ? {...f, evaluationStatus: 'ERROR'} : f));
+          } finally {
+              setLoading(false); 
+          } 
+        } else {
+          console.error('File is undefined');
         }
       }
     };
@@ -218,7 +227,7 @@ const AssignmentCell: React.FC<AssignmentCellProps> = ({ assignment, isPast, onP
                   </span>
                     <div className="file-details">
                         <img src={fileIcon} alt="file type" className="file-icon" />
-                        <p>{submission.file.name}</p>
+                        {submission.file && <p>{submission.file.name}</p>}
                     </div>
                     {!submitted && (submission.evaluationStatus === "LOADING" || submission.evaluationStatus === null) && (
                                 <div className='remove-file' onClick={() => handleFileRemove(index)}>&times;</div>

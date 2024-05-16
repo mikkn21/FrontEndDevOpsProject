@@ -15,7 +15,6 @@ export const convertToCSV = (submissions: Submission[]): string => {
         sub.id.toString(),
         sub.studentId,
         sub.studentName,
-        sub.status,
         sub.evaluationStatus || "", // Handling null by converting it to an empty string
         sub.result || "", // Handle undefined by using an empty string
         sub.log || "" // Handle undefined by using an empty string

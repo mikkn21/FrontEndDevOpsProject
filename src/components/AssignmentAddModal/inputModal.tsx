@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Select, {MultiValue, ActionMeta} from 'react-select';
+import Select, {MultiValue} from 'react-select';
 import './inputModal.css';
 import Button from '../Button/Button';
 import axios from "axios";
@@ -72,7 +72,10 @@ const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMo
                 if (file) formData.append('file', file);
                 
                 // TODO: Find out if response needs to be used for anything
-                const response = await axios.post(endpoint, formData, {
+                // const response = await axios.post(endpoint, formData, {
+                //     headers: { 'Content-Type': 'multipart/form-data' }
+                // });
+               await axios.post(endpoint, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
 
@@ -98,7 +101,6 @@ const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMo
 
     const handleStudentSelection = (
         selectedOptions: MultiValue<{ value: string; label: string; }>, 
-        actionMeta: ActionMeta<{ value: string; label: string; }>
     ) => {
         if (!selectedOptions) {
             setSelectedStudents([]);
