@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Select, {MultiValue} from 'react-select';
-import '../AssignmentAddModal/inputModal.css';
+import '../AssignmentAddModal/assignmentAddModal.css';
 import Button from '../Button/Button';
 import axios from "axios";
 import FileUploadButton from '../Button/FileUploadButton';
@@ -11,17 +11,7 @@ interface InputModalProps {
     assignment: Assignment;
     isOpen: boolean;
     onClose: () => void;
-    onSave: (assignment: { 
-        name: string;
-        dueDate: Date;
-        selectedStudents: Person[];
-        file?: File;
-        visible: boolean;
-        maxTime: number;
-        maxMem: number;
-        vCpu: number;
-        maxSubmissions: number;
-    }) => void; 
+    onSave: (assignment: Assignment) => void;
     testMode?: boolean;
 }
 
@@ -56,10 +46,12 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
         setFile(assignment.file || null);
     }, [assignment]);
 
+
     // call to backend to send the modified assignment
     const handleSubmit = async () => {
         if (testMode) {
             onSave({
+                ...assignment,
                 name,
                 dueDate,
                 selectedStudents,
@@ -71,35 +63,28 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
                 ...(file && { file })  // Only include file if it's not null
               });
             onClose();
+            onClose();
         } else {
             try {
             setLoading(true);
             const formData = new FormData();
+            // Only the configurable fields are sent
             formData.append('name', name);
-            formData.append('dueDate', dueDate.toString());
-            formData.append('visible', String(visible));
+            formData.append('selectedStudents', JSON.stringify(selectedStudents.map(student => student.id)));
+            formData.append('dueDate', dueDate.toISOString().split('T')[0]);
+            formData.append('isPaused', String(visible));
             formData.append('maxTime', String(maxTime));
-            formData.append('maxCpu', String(maxMem));
+            formData.append('maxMem', String(maxMem));
             formData.append('vCpu', String(vCpu));
             formData.append('maxSubmissions', String(maxSubmissions));
-            formData.append('selectedStudents', JSON.stringify(selectedStudents.map(student => student.id)));
+          
             if (file) formData.append('file', file);
-        
-            await axios.put(`${endpoint}/${assignment.id}`, formData, {
+                
+            // assuming the backend send the updated assignment back
+            const response = await axios.put(`${endpoint}/${assignment.id}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-        
-            onSave({
-                name,
-                dueDate,
-                selectedStudents,
-                visible, 
-                maxTime,  
-                maxMem, 
-                vCpu, 
-                maxSubmissions,
-                ...(file && { file })  // Only include file if it's not null
-            });
+            onSave(response.data);
             onClose();
             } catch (error) {
                 console.error("Error updating assignment", error);
@@ -124,11 +109,14 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
 
     const handleFileUpload = (uploadedFile: File) => {
         setFile(uploadedFile);
-      };
+    };
   
-      const handleFileRemove = () => {
+
+    // the remove file allows you to remove the file and add a new 
+    // but you cannot remove the file and save, a file must be present.
+    const handleFileRemove = () => {
         setFile(null);
-      };
+    };
 
 
     if (!isOpen) return null;
@@ -263,7 +251,7 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
                     </div>
                     <div className='file-row'>
                         {file ? (
-                        <div className='file-info'>
+                        <div className='file-info-modal'>
                             <img src={fileIcon} alt="file type" className="file-icon" />
                             <p>{file.name}</p>
                             <div className='remove-file' onClick={handleFileRemove}>&times;</div>

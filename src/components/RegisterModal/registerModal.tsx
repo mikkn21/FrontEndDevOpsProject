@@ -17,19 +17,15 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ onClose }) => {
   const navigate = useNavigate();
 
   const handleRegistration = async () => {
-    // Implement registration logic here
-    // For example, API call to thebackend to create a new user
-    console.log("Registering", { username, password });
     setError("");
-
-    const endpoint = "/api/register";
+    
+    const endpoint = "/api/ENDPOINT"; // Adjust URL to your actual API endpoint
 
     // Get the hashed password to send to the backend
     const hashedPassword = await HashPass(password);
 
     try {
-      console.log("BEFORE ERROR");
-      const response = await axios.post(endpoint, {
+      const response = await axios.post(`${endpoint}/register`, {
         username,
         hashedPassword,
       });
@@ -37,15 +33,14 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ onClose }) => {
       if (response.status === 200 && response.data.token) {
         // Expires in should be reduced to the number of days? Which is fucked as we want to specify something like seconds.
         // can just be converted to 0.xx days?
-        // TODO: get token for the newly registered user
         loginResponse.expires_in = response.data.expires_in;
-        loginResponse.token = "FIXME";
+        loginResponse.token = response.data.token; // assuming token looks about this: `${"authToken"}|${username}|${role}|${id}`;
+
         // Close the modal upon successful registration
         onClose();
         navigate("/");
       }
     } catch (error) {
-      console.log("OTHER STUFF");
       if (axios.isAxiosError(error)) {
         const status = error.response?.status;
         if (status === 400) {

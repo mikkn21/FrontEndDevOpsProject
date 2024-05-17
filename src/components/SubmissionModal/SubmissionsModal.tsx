@@ -38,6 +38,9 @@ const SubmissionsModal: React.FC<SubmissionsModalProps> = ({ isOpen, onRequestCl
     const [loadingIds, setLoadingIds] = useState<Set<number>>(new Set());
     const [error, setError] = useState<{ message: string } | null>(null);
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const submissionsPerPage = 1;
+
     const baseEndpoint = `/api/ENDPOINT`; // Adjust URL to your actual API endpoint
 
 
@@ -94,7 +97,7 @@ const SubmissionsModal: React.FC<SubmissionsModalProps> = ({ isOpen, onRequestCl
             const response = await axios.post(reEndpoint);
             const updatedSubmission = response.data; // Assuming the response is a new submission object
             
-            const updatedSubmissions = submissions.map(sub => {
+            const updatedSubmissions: Submission[] = submissions.map(sub => {
                 if (sub.id === id) {
                     return { ...sub, ...updatedSubmission }; 
                 }
@@ -114,20 +117,21 @@ const SubmissionsModal: React.FC<SubmissionsModalProps> = ({ isOpen, onRequestCl
         }
     };
 
-    // NOTE: that this does nost load since stopping should take priority
-    // TODO: The evaluationStatus for the backend should be changed to ERROR when the evaluation is stopped
+    
     const stopEvaluation = async (id: number) => {
         setError(null);
         try {
             const stopEndpoint = `${baseEndpoint}/stop/${id}`; 
-            await axios.post(stopEndpoint);
+            const response = await axios.post(stopEndpoint); // assuming a new submission object is returned
+            const updatedSubmission = response.data;
             
             const updatedSubmissions: Submission[] = submissions.map(sub => {
                 if (sub.id === id) {
-                    return { ...sub, evaluationStatus: 'ERROR', status: 'STOPPED' }; 
+                    return { ...sub, ...updatedSubmission }; 
                 }
                 return sub;
             });
+
             setSubmissions(updatedSubmissions);
         } catch (error) {
             console.error('Failed to stop submission:', error);
@@ -135,29 +139,38 @@ const SubmissionsModal: React.FC<SubmissionsModalProps> = ({ isOpen, onRequestCl
         } 
     };
 
-    // TODO: The evaluationStatus for the backend should be changed to ERROR when the evaluation is stopped
     const stopAllEvaluations = async () => {
         setError(null);
         try {
             await Promise.all(submissions.map(async (submission) => {
-                const stopEndpoint = `${baseEndpoint}/stop/${submission.id}`;
-                await axios.post(stopEndpoint);
+                await stopEvaluation(submission.id);
             }));
-    
-            const updatedSubmissions: Submission[] = submissions.map(sub => ({
-                ...sub,
-                evaluationStatus: 'ERROR', 
-                status: 'STOPPED'         
-            }));
-            setSubmissions(updatedSubmissions);
         } catch (error) {
             console.error('Failed to stop all submissions:', error);
             setError({ message: "Failed to stop all evaluations. Please try again." });
-        } 
+        }
     };
 
 
-  
+    // Pagination logic
+    const indexOfLastSubmission = currentPage * submissionsPerPage;
+    const indexOfFirstSubmission = indexOfLastSubmission - submissionsPerPage;
+    const currentSubmissions = submissions.slice(indexOfFirstSubmission, indexOfLastSubmission);
+
+    const nextPage = () => {
+        if (currentPage < Math.ceil(submissions.length / submissionsPerPage)) {
+            setCurrentPage(prevPage => prevPage + 1);
+        }
+    };
+
+    const prevPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(prevPage => prevPage - 1);
+        }
+    };
+
+
+
     return (
         <Modal
             isOpen={isOpen}
@@ -168,7 +181,7 @@ const SubmissionsModal: React.FC<SubmissionsModalProps> = ({ isOpen, onRequestCl
             <h2 className='headline'>Submissions</h2>
             {error && <p className="error">{error.message}</p>}
             <div>
-                {submissions.map(submission => (
+                {currentSubmissions.map(submission => (
                     <div key={submission.id} className="submission-item">
                         <div className="submission-header" onClick={() => toggleDetails(submission.id)}>
                             <div className="submission-info">  
@@ -209,6 +222,11 @@ const SubmissionsModal: React.FC<SubmissionsModalProps> = ({ isOpen, onRequestCl
                         )}
                     </div> 
                 ))}
+            </div>
+            <div className="pagination-controls">
+                <button onClick={prevPage} disabled={currentPage === 1}>Previous</button>
+                <span>{currentPage} of {Math.ceil(submissions.length / submissionsPerPage)}</span>
+                <button onClick={nextPage} disabled={currentPage === Math.ceil(submissions.length / submissionsPerPage)}>Next</button>
             </div>
             <div className="footer">
                 <button className="close-button" onClick={onRequestClose}>Close</button>

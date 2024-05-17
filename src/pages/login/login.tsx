@@ -74,6 +74,7 @@ const LoginPage: React.FC = () => {
       return;
     }
 
+
     const endpoint = `${config.VITE_BACKEND_URL}/login/authentication`;
 
     // Get the hashed password to send to the backend
@@ -91,7 +92,8 @@ const LoginPage: React.FC = () => {
           // can just be converted to 0.xx days?
           const initialLogin = loginResponse;
           Object.assign(loginResponse, {
-            //?
+            token: response.data.token,
+            expires_in: response.data.expires_in,
           });
 
           // if was not logged in at first, navigate the user

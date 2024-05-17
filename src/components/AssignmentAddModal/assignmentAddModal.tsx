@@ -1,32 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import Select, {MultiValue} from 'react-select';
-import './inputModal.css';
+import './assignmentAddModal.css';
 import Button from '../Button/Button';
 import axios from "axios";
 import FileUploadButton from '../Button/FileUploadButton';
 import fileIcon from '../../assets/icons8-file.svg'
-import { Person, Role, Status } from '../../utils/types';
+import { Assignment, Person, Role, Status } from '../../utils/types';
 
-interface InputModalProps {
+interface assignmentAddModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (assignment: { 
-        name: string;
-        dueDate: Date;
-        selectedStudents: Person[];
-        file?: File;
-        visible: boolean;
-        maxTime: number;
-        maxMem: number;
-        vCpu: number;
-        maxSubmissions: number;
-    }) => void;  
+    onSave: (assignment: Assignment) => void;
     testMode?: boolean;
+    teacherId?: string;
 }
 
 
 
-const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMode=false}) => {
+const assignmentAddModal: React.FC<assignmentAddModalProps> = ({ isOpen, onClose, onSave, testMode=false, teacherId='default-teacher-id'}) => {
     const [name, setName] = useState('');
     const [dueDate, setDueDate] = useState('');
     const [students, setStudents] = useState<Person[]>([]);
@@ -40,28 +31,36 @@ const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMo
     const [vCpu, setVCpu] = useState(0); // Default to 0
     const [maxSubmissions, setMaxSubmissions] = useState(2); // Default to 2
     
+ 
+
     const endpoint = `/api/ENDPOINT`; // Adjust URL to your actual API endpoint
 
     // call to backend to send the new assignment
     const handleSubmit = async () => {
         if (testMode) {
-            onSave({
+            const newAssignment: Assignment = {
+                id: Math.random(), // Dummy ID for test mode
                 name,
                 dueDate: new Date(dueDate),
                 selectedStudents,
-                visible, 
-                maxTime,  
-                maxMem, 
-                vCpu, 
-                maxSubmissions, 
+                visible,
+                maxTime,
+                maxMem,
+                vCpu,
+                maxSubmissions,
+                StudentSubmissions: [], // Add empty submissions list
+                isPaused: false, // Default value for isPaused
+                teacher: teacherId,
                 ...(file && { file })  // Only include file if it's not null
-                });
+              };
+              onSave(newAssignment);
             onClose();
         } else {
             try {
                 setLoading(true);
                 const formData = new FormData();
                 formData.append('name', name);
+                formData.append('teacher', teacherId);
                 formData.append('dueDate', dueDate);
                 formData.append('visible', String(visible));
                 formData.append('maxTime', String(maxTime));
@@ -71,25 +70,10 @@ const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMo
                 formData.append('selectedStudents', JSON.stringify(selectedStudents.map(student => student.id)));
                 if (file) formData.append('file', file);
                 
-                // TODO: Find out if response needs to be used for anything
-                // const response = await axios.post(endpoint, formData, {
-                //     headers: { 'Content-Type': 'multipart/form-data' }
-                // });
-               await axios.post(endpoint, formData, {
+                const response = await axios.post(endpoint, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
-
-                onSave({
-                    name,
-                    dueDate: new Date(dueDate),
-                    selectedStudents,
-                    visible,
-                    maxTime,
-                    maxMem,
-                    vCpu,
-                    maxSubmissions,
-                    ...(file && { file })
-                  });
+                onSave(response.data); // assuming the response is the new assignment with a id
                 onClose();
             } catch (error) {
                 setError({ message: 'Failed to create the assignment. Please try again.' });
@@ -112,11 +96,11 @@ const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMo
 
     const handleFileUpload = (uploadedFile: File) => {
         setFile(uploadedFile);
-      };
+    };
   
-      const handleFileRemove = () => {
+    const handleFileRemove = () => {
         setFile(null);
-      };
+    };
 
 
     if (!isOpen) return null;
@@ -138,7 +122,7 @@ const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMo
             const fetchStudents = async () => {
                 setLoading(true);
                 try {
-                    const response = await axios.get(endpoint);
+                    const response = await axios.get(`${endpoint}/allStudents`);
                     setStudents(response.data); 
                   
                 } catch (error) {
@@ -249,7 +233,7 @@ const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMo
                     </div>
                     <div className='file-row'>
                         {file ? (
-                        <div className='file-info'>
+                        <div className='file-info-modal'>
                             <img src={fileIcon} alt="file type" className="file-icon" />
                             <p>{file.name}</p>
                             <div className='remove-file' onClick={handleFileRemove}>&times;</div>
@@ -267,4 +251,4 @@ const InputModal: React.FC<InputModalProps> = ({ isOpen, onClose, onSave, testMo
         </div>
     )};
 
-export default InputModal;
+export default assignmentAddModal;

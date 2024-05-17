@@ -16,7 +16,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const role = getCookieRole();
 
   if (requireAdmin && isAuthenticated && role != "admin") {
-    // Redirect to home if the user is not an admin and display error message
     return <Navigate to="/" replace />;
   }
 

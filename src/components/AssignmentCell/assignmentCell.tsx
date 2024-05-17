@@ -15,27 +15,35 @@ interface AssignmentCellProps {
     onPause?: () => void;
     onDelete?: (id: number) => void;
     onConfigure?: (id: number) => void;
-    studentId: string | undefined;
+    studentId?: string;
 }
 
-const AssignmentCell: React.FC<AssignmentCellProps> = ({ assignment, isPast, onPause, onDelete, onConfigure, studentId }) => {
+const AssignmentCell: React.FC<AssignmentCellProps> = ({ assignment, isPast, onPause, onDelete, onConfigure, studentId='default-student-id' }) => {
+
+    const role = getCookieRole();
+    const studentName = getCookieUsername() ?? "default-student-name";
 
     const effectiveAssignmentName = assignment.name || "Default assignment name";
     
-    const initialSubmissions = assignment.StudentSubmissions.filter(sub => sub.studentId === studentId);
+    // if your a teacher or a student with a invalid id (default) initialSubmissions are empty 
+    // otherwise get your initialSubmissions
+    const initialSubmissions = role === 'student' && studentId !== 'default-student-id'
+    ? assignment.StudentSubmissions.filter(sub => sub.studentId === studentId)
+    : [];
+  
     const [files, setFiles] = useState<Submission[]>(initialSubmissions);
 
     const [canUploadMore, setCanUploadMore] = useState(true);
     const [submitted, setSubmitted] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [canceledSubmissions, setCanceledSubmissions] = useState<Submission[]>([]);
 
     const filesRef = useRef<Submission[]>(files);
     useEffect(() => {
         filesRef.current = files;
     }, [files]);
 
-    const role = getCookieRole();
-    const studentName = getCookieUsername();
+    
     const baseEndpoint = `/api/ENDPOINT`; // Adjust URL to your actual API endpoint
     let testMode = true;
 
@@ -62,8 +70,9 @@ const AssignmentCell: React.FC<AssignmentCellProps> = ({ assignment, isPast, onP
       if (testMode) {
         setTimeout(() => {
           const currentFiles = filesRef.current;
-          if (!currentFiles.some(f => f.file === fileToSubmit.file)) {
-              return; 
+          if (!currentFiles.some(f => f.file === fileToSubmit.file) || canceledSubmissions.some(c => c.file === fileToSubmit.file)) {
+            console.log("test");
+            return; // If the submission was canceled, do not update the state
           }
           setFiles(prevFiles => prevFiles.map(f => 
               f.file === fileToSubmit.file ? { ...f, evaluationStatus: 'SUCCESS' as const } : f
@@ -75,38 +84,44 @@ const AssignmentCell: React.FC<AssignmentCellProps> = ({ assignment, isPast, onP
       } else {
         if (fileToSubmit.file) {
           const formData = new FormData();
+          formData.append("studentId", studentId);
+          formData.append("studentName", studentName);
           formData.append("file", fileToSubmit.file);
-
-          // Optional: Append additional data if needed
-          formData.append("assignmentId", String(assignment.id));
-          if (studentId) {
-            formData.append("studentId", studentId);
-          }
-      
           try {
               setLoading(true); 
-              // const response = await axios.post(`${baseEndpoint}/submit/`, formData, {
-              //     headers: {
-              //         'Content-Type': 'multipart/form-data',
-              //     }
-              // });
-              await axios.post(`${baseEndpoint}/submit/`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                }
-            });
-              const currentFiles = filesRef.current;
-              if (!currentFiles.some(f => f.file === fileToSubmit.file)) {
-                  
-                  return; // Submission has been cancelled , do not update state
-              }
+              const response = await axios.post(`${baseEndpoint}/submit/`, formData, {
+                  headers: {
+                      'Content-Type': 'multipart/form-data',
+                  }
+              });
 
-              setFiles(prevFiles => prevFiles.map(f => f.file === fileToSubmit.file ? { ...f, evaluationStatus: 'SUCCESS' } : f));
+              // assuming the response is a new submission object
+              // with id and status fields set by the backend
+              const newSubmission : Submission = response.data; 
+              
+            
+              const currentFiles = filesRef.current;
+              if (!currentFiles.some(f => f.file === fileToSubmit.file) || canceledSubmissions.some(c => c.file === fileToSubmit.file)) {
+                return; // Submission has been cancelled, do not update state
+              } 
+
+              setFiles(prevFiles => prevFiles.map(f => 
+                f.file === fileToSubmit.file ? { 
+                  ...f, 
+                  // set the fields that the backend has updated
+                  evaluationStatus: newSubmission.evaluationStatus, 
+                  id: newSubmission.id, 
+                  log: newSubmission.log,
+                  result: newSubmission.result
+                } : f
+              ));
               setCanUploadMore(true);
               setSubmitted(true);
           } catch (error) {
             console.error('Error uploading file:', error);
-            setFiles(prevFiles => prevFiles.map(f => f.file === fileToSubmit.file ? {...f, evaluationStatus: 'ERROR'} : f));
+            setFiles(prevFiles => prevFiles.map(f => 
+              f.file === fileToSubmit.file ? {...f, evaluationStatus: 'ERROR'} : f
+            ));
           } finally {
               setLoading(false); 
           } 
@@ -116,16 +131,17 @@ const AssignmentCell: React.FC<AssignmentCellProps> = ({ assignment, isPast, onP
       }
     };
   
-    const handleSubmissionUpload = (newFile: File) => {
+    const handleSubmissionUpload = (fileToSubmit: File) => {
       if (files.length >= assignment.maxSubmissions) {
           return;
       }
 
       const newSubmission: Submission = { 
-          id: 0,
-          studentId: studentId || '', 
-          studentName: studentName || '', 
-          file: newFile, 
+          // undefined and null is set by the backend once the submission has been submitted
+          id: -1, // Set to -1 to indicate that it is a new submission without an actual id
+          studentId: studentId, 
+          studentName: studentName, 
+          file: fileToSubmit, 
           evaluationStatus: null,
           log: undefined,
           result: undefined,
@@ -136,23 +152,19 @@ const AssignmentCell: React.FC<AssignmentCellProps> = ({ assignment, isPast, onP
   };
 
     const handleFileRemove = async (index: number) => {
-      const submissionToRemove = files[index];
+      const submissionToRemove : Submission = files[index];
 
       if (!submissionToRemove) {
           console.error("Submission not found");
           return;
       }
 
-      if (submissionToRemove.evaluationStatus !== 'LOADING' && submissionToRemove.evaluationStatus !== null) {
-        console.error("Cannot remove a submission that is already evaluated.");
-        return;
-    }
-
+      
       if (submissionToRemove.evaluationStatus === 'LOADING') {
-          handleCancelSubmission(submissionToRemove);
+          await handleCancelSubmission(submissionToRemove);
           return;
       }
-
+      setCanceledSubmissions(prevCanceled => [...prevCanceled, submissionToRemove]);
       setFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
       setCanUploadMore(true);
       setSubmitted(false);
@@ -162,13 +174,18 @@ const AssignmentCell: React.FC<AssignmentCellProps> = ({ assignment, isPast, onP
     const handleCancelSubmission = async (submission: Submission) => {
         try {
             setLoading(true);
-            await axios.post(`${baseEndpoint}/${assignment.id}/submissions/${submission.id}/cancel`);
-            setFiles(prevFiles => prevFiles.filter(f => f !== submission));
+            const response = await axios.post(`${baseEndpoint}/${assignment.id}/submissions/${submission.id}/cancel`);
+            const updatedAssignment: Assignment = response.data;
+
+            setFiles(updatedAssignment.StudentSubmissions.filter(sub => sub.studentId === studentId));
+            setCanceledSubmissions(prevCanceled => [...prevCanceled, submission]);
             setCanUploadMore(true);
             setSubmitted(false);
         } catch (error) {
-            submission.evaluationStatus = 'ERROR';
             console.error('Error cancelling submission:', error);
+            setFiles(prevFiles => prevFiles.map(f => 
+              f === submission ? { ...f, evaluationStatus: 'ERROR' } : f
+            ));
         } finally {
             setLoading(false);
         }

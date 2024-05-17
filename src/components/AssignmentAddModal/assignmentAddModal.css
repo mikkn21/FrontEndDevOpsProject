@@ -24,9 +24,10 @@
 
 
 
-.file-info {
+.file-info-modal {
     display: flex;
     justify-content: left;
+    position: relative;
 }
 
 .date-row {
@@ -42,13 +43,18 @@
 .remove-file {
     display: none;
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 20%; 
+    right: 10px; 
+    transform: translateY(-50%);
     cursor: pointer;
-    font-size: 20px;
+    font-size: 12px;
     background: #ccc;
     border-radius: 50%;
     padding: 0 5px;
+  }
+  
+  .file-info-modal:hover .remove-file {
+    display: block;
   }
 
 .modal {

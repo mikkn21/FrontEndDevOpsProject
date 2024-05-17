@@ -4,8 +4,8 @@ import "./assignmentTable.css";
 import AssignmentCell from "../AssignmentCell/assignmentCell";
 import { getCookie, getCookieRole, getCookieId } from "../../utils/cookieUtils";
 import Button from "../Button/Button";
-import InputModal from "../AssignmentAddModal/inputModal";
-import { Assignment, Person } from "../../utils/types";
+import AssignmentAddModal from "../AssignmentAddModal/assignmentAddModal";
+import { Assignment } from "../../utils/types";
 import ConfigureModal from "../AssignmentConfigureModal/configureModal";
 
 
@@ -24,24 +24,49 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({testMode = false,}) =>
   const pageSize = 2; // Number of assignments per page
 
   const role = getCookieRole();
-  
-  // TODO: Needs to make a backend call to delete the assignment
-  const handleDeleteAssignment = (assignmentId: number) => {
-    setAssignments((prevAssignments) =>
-      prevAssignments.filter((a) => a.id !== assignmentId)
-    );
-  };
+  const baseEndpoint = `/api/ENDPOINT`; // Adjust URL to your actual API endpoint
+
+  const handleDeleteAssignment = async (assignmentId: number) => {
+    try {
+        const response = await axios.delete(`${baseEndpoint}/assignments/${assignmentId}`);
+
+        if (response.status === 200) {
+            // Update state to remove the assignment
+            setAssignments((prevAssignments) =>
+                prevAssignments.filter((a) => a.id !== assignmentId)
+            );
+        } else {
+            setError({ message: 'Failed to delete assignment' })
+            console.error('Failed to delete assignment:', response.status);
+        }
+    } catch (error) {
+        setError({ message: 'Failed to delete assignment' })
+        console.error('Error deleting assignment:', error);
+    }
+};
 
 
-  // TODO: Needs to make a backend call to pause the assignment
-  const handlePauseAssignment = (assignmentId: number) => {
-    setAssignments((prevAssignments) =>
-      prevAssignments.map((assignment) =>
-        assignment.id === assignmentId
-          ? { ...assignment, isPaused: !assignment.isPaused }
-          : assignment
-      )
-    );
+  const handlePauseAssignment = async (assignmentId: number) => {
+      try {
+        const response = await axios.put(`${baseEndpoint}/assignments/${assignmentId}/pause`);
+
+        if (response.status === 200) {
+            // assuming i get a new assignment object back with pause = true
+            const updatedAssignment = response.data;
+        
+            setAssignments((prevAssignments) =>
+              prevAssignments.map((assignment) =>
+                assignment.id === assignmentId ? updatedAssignment : assignment
+              )
+            );
+        } else {
+            setError({ message: 'Failed to delete assignment' })
+            console.error('Failed to delete assignment:', response.status);
+        }
+    } catch (error) {
+        setError({ message: 'Failed to delete assignment' })
+        console.error('Error deleting assignment:', error);
+    }
   };
 
   const handleOpenModal = () => {
@@ -56,7 +81,11 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({testMode = false,}) =>
   };
   
 
-  // TODO: Needs to make a backend call to update the assignment
+  const handleCreateAssignment = (newAssignment: Assignment) => {
+    setAssignments(prevAssignments => [...prevAssignments, newAssignment]);
+  };
+
+
   const handleUpdateAssignment = (updatedAssignment: Assignment) => {
     setAssignments(prevAssignments =>
       prevAssignments.map(assignment =>
@@ -66,31 +95,6 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({testMode = false,}) =>
     setSelectedAssignment(null);
   };
 
-  // TODO: Needs to make a backend call to create the assignment
-  const handleCreateAssignment = (modalData: {
-    name: string; 
-    dueDate: Date; 
-    selectedStudents: Person[]; 
-    file?: File; 
-    visible: boolean; 
-    maxTime: number; 
-    maxMem: number; 
-    vCpu: number; 
-    maxSubmissions: number;
-  }) => {
-    const newId = Math.max(0, ...assignments.map(a => a.id)) + 1;
-  
-    const newAssignment: Assignment = {
-      ...modalData,
-      id: newId,
-      isPaused: false,
-      StudentSubmissions: [],
-      teacher: "",
-      dueDate: new Date(modalData.dueDate) // Convert the dueDate string to a Date object
-    };
-  
-    setAssignments(prevAssignments => [...prevAssignments, newAssignment]);
-  };
 
 
   // When the component mounts, fetch the assignments
@@ -115,8 +119,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({testMode = false,}) =>
         setLoading(false);
         return;
       }
-      const baseEndpoint = `/api/ENDPOINT`; // Adjust URL to your actual API endpoint
-      
+    
       // get all assignments in a table
       axios
         .get(`${baseEndpoint}/assignments/${userId}`)
@@ -182,16 +185,6 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({testMode = false,}) =>
   );
 
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
-
-
-
   return (
     <div>
       <div className="table">
@@ -210,7 +203,12 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({testMode = false,}) =>
           </div>
         </div>
         <div>
-          {pagedAssignments.map((assignment) => (
+        {loading ? (
+            <div>Loading...</div>
+          ) : error ? (
+            <div>Error: {error.message}</div>
+          ) : (
+          pagedAssignments.map((assignment) => (
             <AssignmentCell
               key={assignment.id}
               assignment={assignment}
@@ -222,9 +220,10 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({testMode = false,}) =>
                   : undefined
               }
               onConfigure={role === "teacher" ? () => handleOpenConfigureModal(assignment.id) : undefined}
-              studentId={role === "student" ? getCookieId() ?? undefined : undefined}
+              studentId={role == 'student' ? getCookieId() ?? undefined : undefined}
             />
-          ))}
+          ))
+        )}
         </div>
       </div>
       <div className="pagination">
@@ -240,11 +239,12 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({testMode = false,}) =>
         </button>
       </div>
       {showModal && (
-      <InputModal
+      <AssignmentAddModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         onSave={handleCreateAssignment}
         testMode={true}
+        teacherId={getCookieId() || undefined} // if no teacherId, pass undefined to use the default value
       /> 
       )}
       {selectedAssignment && (
