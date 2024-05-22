@@ -45,7 +45,7 @@ const AssignmentCell: React.FC<AssignmentCellProps> = ({ assignment, isPast, onP
 
     
     const baseEndpoint = `/api/ENDPOINT`; // Adjust URL to your actual API endpoint
-    let testMode = true;
+    let testMode = false;
 
     const handleSubmissionSubmit = async () => {
       if (files.length === 0) {
@@ -267,7 +267,7 @@ const AssignmentCell: React.FC<AssignmentCellProps> = ({ assignment, isPast, onP
                 />
             </>
           ) : (
-              <ViewSubmissionsButton AssignmentId={assignment.id} testMode={true} />
+              <ViewSubmissionsButton AssignmentId={assignment.id} testMode={false} />
           )}
         </div>
       </div>

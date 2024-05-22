@@ -7,7 +7,7 @@ import Button from "../Button/Button";
 import AssignmentAddModal from "../AssignmentAddModal/assignmentAddModal";
 import { Assignment } from "../../utils/types";
 import ConfigureModal from "../AssignmentConfigureModal/configureModal";
-
+import { sendLogToLoki } from "../../utils/loki";
 
 interface AssignmentTableProps {
   testMode?: boolean;
@@ -41,6 +41,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({testMode = false,}) =>
         }
     } catch (error) {
         setError({ message: 'Failed to delete assignment' })
+        sendLogToLoki(`Failed to delete assignment: ${error}`, 'error')
         console.error('Error deleting assignment:', error);
     }
 };
@@ -243,7 +244,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({testMode = false,}) =>
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         onSave={handleCreateAssignment}
-        testMode={true}
+        testMode={false}
         teacherId={getCookieId() || undefined} // if no teacherId, pass undefined to use the default value
       /> 
       )}

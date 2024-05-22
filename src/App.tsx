@@ -24,7 +24,7 @@ const App: React.FC = () => {
         />
         <Route
           path="/admin"
-          element={<ProtectedRoute requireAdmin={true} element={<Admin testMode={true} />} />}
+          element={<ProtectedRoute requireAdmin={true} element={<Admin testMode={false} />} />}
         />
       </Routes>
     </BrowserRouter>
