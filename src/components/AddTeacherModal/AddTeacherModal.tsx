@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import HashPassword from '../HashPass/passwordHash';
 import { Person, Role } from '../../utils/types';
+import { config } from "../../config";
 
 const customStyles = {
     content: {
@@ -34,7 +35,7 @@ const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ isOpen, testMode = fa
     const [password, setPassword] = useState("");
     const [error, setError] = useState<{ message: string } | null>(null);
     
-    const baseEndpoint = `/api/ENDPOINT`; // Adjust URL to your actual API endpoint
+    const baseEndpoint = `${config.VITE_BACKEND_URL}/users`; // Adjust URL to your actual API endpoint
 
 
     const handleRegistration = async () => {
@@ -48,9 +49,10 @@ const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ isOpen, testMode = fa
             const hashedPassword = await HashPassword(password);
 
             try {
-            const response = await axios.post(`${baseEndpoint}/create/teacher`, {
-                username,
-                hashedPassword,
+            const response = await axios.post(`${baseEndpoint}/addUser`, {
+                'name': username,
+                'password': hashedPassword,
+                'role': 0
             });
                 if (response.data) { 
                     // Assume the response is the new teacher as a Person object 

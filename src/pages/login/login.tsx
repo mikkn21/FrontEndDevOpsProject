@@ -83,8 +83,8 @@ const LoginPage: React.FC = () => {
     const refreshToken = async () => {
       try {
         const response = await axios.post(endpoint, {
-          username,
-          hashedPassword,
+          'name': username,
+          'password': hashedPassword,
         });
 
         if (response.status === 200 && response.data.token) {
