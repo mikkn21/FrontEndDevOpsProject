@@ -30,7 +30,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ onClose }) => {
         "name":username,
         "password":hashedPassword,
       });
-
+      console.log("Response : ", response);
       if (response.status === 200 && response.data.token) {
         // Expires in should be reduced to the number of days? Which is fucked as we want to specify something like seconds.
         // can just be converted to 0.xx days?

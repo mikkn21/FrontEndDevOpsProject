@@ -21,6 +21,21 @@ export default defineConfig(({ mode }) => {
       changeOrigin: true,
       secure: false,
     },
+    "/users": {
+      target: BACKEND_URL,
+      changeOrigin: true,
+      secure: false,
+    },
+    "/assignment": {
+      target: BACKEND_URL,
+      changeOrigin: true,
+      secure: false,
+    },
+    "/solution": {
+      target: BACKEND_URL,
+      changeOrigin: true,
+      secure: false,
+    },
   }
 
   return {

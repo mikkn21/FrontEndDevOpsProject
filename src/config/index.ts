@@ -1,16 +1,16 @@
 type APIEnvVars = {
   VITE_BACKEND_URL: string;
+  VITE_BACKEND_ONLINE: string;
 };
 
 export const config: APIEnvVars = {
   VITE_BACKEND_URL: "",
+  VITE_BACKEND_ONLINE: ""
 };
 
 export async function loadConfig() {
   const configuration = import.meta.env.PROD ? await fetchApi() : fetchLocal();
-  configuration.VITE_BACKEND_URL = import.meta.env.PROD
-    ? config.VITE_BACKEND_URL
-    : "";
+  console.log("in env: ", import.meta.env);
   Object.assign(config, configuration);
 }
 

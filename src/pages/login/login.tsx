@@ -51,7 +51,7 @@ const LoginPage: React.FC = () => {
     // STUDENT login
     if (username === "student" && password === "student") {
       const role = "student";
-      const iD = "123456";
+      const iD = "123456/";
       const tokenValue = `${"authToken"}|${username}|${role}|${iD}`;
       Object.assign(loginResponse, {
         token: tokenValue,
@@ -82,11 +82,12 @@ const LoginPage: React.FC = () => {
 
     const refreshToken = async () => {
       try {
+        console.log("BACKENDURL : ", endpoint);
         const response = await axios.post(endpoint, {
           'name': username,
           'password': hashedPassword,
         });
-
+        console.log("Response : ", response);
         if (response.status === 200 && response.data.token) {
           // Expires in should be reduced to the number of days? Which is fucked as we want to specify something like seconds.
           // can just be converted to 0.xx days?
