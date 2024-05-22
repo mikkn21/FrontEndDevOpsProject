@@ -75,7 +75,7 @@ const LoginPage: React.FC = () => {
     }
 
 
-    const endpoint = `${config.VITE_BACKEND_URL}/login/authentication`;
+    const endpoint = `${config.VITE_BACKEND_URL}/users/login`;
 
     // Get the hashed password to send to the backend
     const hashedPassword = await HashPass(password);
