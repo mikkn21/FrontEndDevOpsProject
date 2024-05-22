@@ -44,7 +44,7 @@ const AssignmentCell: React.FC<AssignmentCellProps> = ({ assignment, isPast, onP
     }, [files]);
 
     
-    const baseEndpoint = `/api/ENDPOINT`; // Adjust URL to your actual API endpoint
+    const baseEndpoint = '${config.VITE_BACKEND_URL}/solution';; // Adjust URL to your actual API endpoint
     let testMode = false;
 
     const handleSubmissionSubmit = async () => {
@@ -89,7 +89,7 @@ const AssignmentCell: React.FC<AssignmentCellProps> = ({ assignment, isPast, onP
           formData.append("file", fileToSubmit.file);
           try {
               setLoading(true); 
-              const response = await axios.post(`${baseEndpoint}/submit/`, formData, {
+              const response = await axios.post(`${baseEndpoint}/addSolution`, formData, {
                   headers: {
                       'Content-Type': 'multipart/form-data',
                   }

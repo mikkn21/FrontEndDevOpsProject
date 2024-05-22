@@ -8,6 +8,7 @@ import AssignmentAddModal from "../AssignmentAddModal/assignmentAddModal";
 import { Assignment } from "../../utils/types";
 import ConfigureModal from "../AssignmentConfigureModal/configureModal";
 import { sendLogToLoki } from "../../utils/loki";
+import { config } from "../../config";
 
 interface AssignmentTableProps {
   testMode?: boolean;
@@ -24,11 +25,11 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({testMode = false,}) =>
   const pageSize = 2; // Number of assignments per page
 
   const role = getCookieRole();
-  const baseEndpoint = `/api/ENDPOINT`; // Adjust URL to your actual API endpoint
+  const baseEndpoint = `${config.VITE_BACKEND_URL}`; // Adjust URL to your actual API endpoint
 
   const handleDeleteAssignment = async (assignmentId: number) => {
     try {
-        const response = await axios.delete(`${baseEndpoint}/assignments/${assignmentId}`);
+        const response = await axios.delete(`${baseEndpoint}/assignment/removeAssignmentId/${assignmentId}`);
 
         if (response.status === 200) {
             // Update state to remove the assignment
@@ -49,7 +50,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({testMode = false,}) =>
 
   const handlePauseAssignment = async (assignmentId: number) => {
       try {
-        const response = await axios.put(`${baseEndpoint}/assignments/${assignmentId}/pause`);
+        const response = await axios.put(`${baseEndpoint}/assignment/pause/${assignmentId}`);
 
         if (response.status === 200) {
             // assuming i get a new assignment object back with pause = true
@@ -61,12 +62,12 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({testMode = false,}) =>
               )
             );
         } else {
-            setError({ message: 'Failed to delete assignment' })
-            console.error('Failed to delete assignment:', response.status);
+            setError({ message: 'Failed to pause assignment' })
+            console.error('Failed to pause assignment:', response.status);
         }
     } catch (error) {
-        setError({ message: 'Failed to delete assignment' })
-        console.error('Error deleting assignment:', error);
+        setError({ message: 'Failed to pause assignment' })
+        console.error('Error pause assignment:', error);
     }
   };
 
@@ -120,10 +121,10 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({testMode = false,}) =>
         setLoading(false);
         return;
       }
-    
+      
       // get all assignments in a table
       axios
-        .get(`${baseEndpoint}/assignments/${userId}`)
+        .get(role === 'student' ? `${baseEndpoint}/assignment/getUserAssignments//${userId}` : `${baseEndpoint}/assignment/getTeacherAssignment/${userId}`)
         .then((response) => {
           const assignmentsFromAPI = response.data;
           // Filter out assignments with visibility=false if role is "student"
