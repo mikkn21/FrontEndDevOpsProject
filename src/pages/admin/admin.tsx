@@ -6,6 +6,7 @@ import './admin.css';
 import Button from '../../components/Button/Button';
 import { AiOutlineDelete, AiOutlinePauseCircle  } from "react-icons/ai";
 import AddTeacherModal from '../../components/AddTeacherModal/AddTeacherModal';
+import { config } from '../../config';
 
 type AdminProps = {
     testMode?: boolean;
@@ -23,7 +24,7 @@ const Admin: React.FC<AdminProps> = ({testMode = false}) => {
 
     const itemsPerPage = 2;
 
-    const baseEndpoint = `/api/ENDPOINT`; // Adjust URL to your actual API endpoint
+    const endpoint = `${config.VITE_BACKEND_URL}/users/login`;
 
     const addError = (newError: string) => {
         setErrors([newError]); 
@@ -46,7 +47,7 @@ const Admin: React.FC<AdminProps> = ({testMode = false}) => {
             console.log('Fetching students and teachers');
             const fetchStudents = async () => {
                 try {
-                    const studentEndpoint = `${baseEndpoint}/AAAstudents`;
+                    const studentEndpoint = `${endpoint}/users/getAllStudents`;
                     const response = await axios.get<Person[]>(studentEndpoint);
                     setStudents(response.data);
                 } catch (err) { 
@@ -57,7 +58,7 @@ const Admin: React.FC<AdminProps> = ({testMode = false}) => {
 
             const fetchTeachers = async () => {
                 try {
-                    const teacherEndpoint = `${baseEndpoint}/AAAteacher`; 
+                    const teacherEndpoint = `${endpoint}/users/getAllTeachers`; 
                     const response = await axios.get<Person[]>(teacherEndpoint);
                     setTeachers(response.data);
                 } catch (err) {
@@ -68,7 +69,7 @@ const Admin: React.FC<AdminProps> = ({testMode = false}) => {
 
             Promise.all([fetchStudents(), fetchTeachers()]).finally(() => setLoading(false));
         }
-    }, [testMode, baseEndpoint]);
+    }, [testMode, endpoint]);
 
 
 
@@ -78,12 +79,12 @@ const Admin: React.FC<AdminProps> = ({testMode = false}) => {
     const handleDelete = async (id: string, isStudent: boolean) => {
         try {
             if (isStudent) {
-                const deleteEndpoint = `${baseEndpoint}/student/${id}/delete`;
+                const deleteEndpoint = `${endpoint}/users/remove/${id}`;
                 await axios.delete(deleteEndpoint);
                 setStudents(prevStudents => prevStudents.filter(student => student.id !== id));
                 return;
             } else {
-                const deleteEndpoint = `${baseEndpoint}/teacher/${id}/delete`;
+                const deleteEndpoint = `${endpoint}/users/remove/${id}`;
                 await axios.delete(deleteEndpoint);  
                 setTeachers(prevTeachers => prevTeachers.filter(teacher => teacher.id !== id));
             }
@@ -94,7 +95,7 @@ const Admin: React.FC<AdminProps> = ({testMode = false}) => {
     };
     
     const handlePause = async (id: string) => {
-        const pauseEndpoint = `${baseEndpoint}/teacher/${id}/pause`;
+        const pauseEndpoint = `${endpoint}/teacher/${id}/pause`; // not implemented
         try {
             await axios.post(pauseEndpoint);
             setTeachers(prevTeachers => prevTeachers.map(teacher => 

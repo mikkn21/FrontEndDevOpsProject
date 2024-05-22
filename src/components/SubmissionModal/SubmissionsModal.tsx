@@ -6,6 +6,7 @@ import { AiOutlineRedo, AiOutlineStop, AiOutlineFileZip, AiOutlineFileText } fro
 import axios from 'axios';
 import { convertToCSV, downloadCSV  } from '../../utils/cvsUtils';
 import { downloadLogsZip } from '../../utils/logsUtills';
+import { config } from '../../config';
 
 
 const customStyles = {
@@ -41,7 +42,7 @@ const SubmissionsModal: React.FC<SubmissionsModalProps> = ({ isOpen, onRequestCl
     const [currentPage, setCurrentPage] = useState(1);
     const submissionsPerPage = 1;
 
-    const baseEndpoint = `/api/ENDPOINT`; // Adjust URL to your actual API endpoint
+    const endpoint = `${config.VITE_BACKEND_URL}`;
 
 
     useEffect(() => {
@@ -93,8 +94,8 @@ const SubmissionsModal: React.FC<SubmissionsModalProps> = ({ isOpen, onRequestCl
             // Simulate a delay of 2000 milliseconds (2 seconds)
             await new Promise(resolve => setTimeout(resolve, 2000));
             
-            const reEndpoint = `${baseEndpoint}/re/${id}`; 
-            const response = await axios.post(reEndpoint);
+            const reEndpoint = `${endpoint}/solution/evaluateSolution/${id}`; 
+            const response = await axios.get(reEndpoint);
             const updatedSubmission = response.data; // Assuming the response is a new submission object
             
             const updatedSubmissions: Submission[] = submissions.map(sub => {
@@ -121,7 +122,7 @@ const SubmissionsModal: React.FC<SubmissionsModalProps> = ({ isOpen, onRequestCl
     const stopEvaluation = async (id: number) => {
         setError(null);
         try {
-            const stopEndpoint = `${baseEndpoint}/stop/${id}`; 
+            const stopEndpoint = `${endpoint}/stop/${id}`; // not implemented yet
             const response = await axios.post(stopEndpoint); // assuming a new submission object is returned
             const updatedSubmission = response.data;
             

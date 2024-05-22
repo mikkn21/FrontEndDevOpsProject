@@ -6,6 +6,7 @@ import axios from "axios";
 import FileUploadButton from '../Button/FileUploadButton';
 import fileIcon from '../../assets/icons8-file.svg'
 import { Assignment, Person, Role, Status } from '../../utils/types';
+import { config } from '../../config';
 
 interface assignmentAddModalProps {
     isOpen: boolean;
@@ -33,7 +34,7 @@ const assignmentAddModal: React.FC<assignmentAddModalProps> = ({ isOpen, onClose
     
  
 
-    const endpoint = `/api/ENDPOINT`; // Adjust URL to your actual API endpoint
+    const endpoint = `${config.VITE_BACKEND_URL}/`;
 
     // call to backend to send the new assignment
     const handleSubmit = async () => {
@@ -70,7 +71,7 @@ const assignmentAddModal: React.FC<assignmentAddModalProps> = ({ isOpen, onClose
                 formData.append('selectedStudents', JSON.stringify(selectedStudents.map(student => student.id)));
                 if (file) formData.append('file', file);
                 
-                const response = await axios.post(endpoint, formData, {
+                const response = await axios.post(`${endpoint}/assignment/addAssignment`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
                 onSave(response.data); // assuming the response is the new assignment with a id
@@ -122,7 +123,7 @@ const assignmentAddModal: React.FC<assignmentAddModalProps> = ({ isOpen, onClose
             const fetchStudents = async () => {
                 setLoading(true);
                 try {
-                    const response = await axios.get(`${endpoint}/allStudents`);
+                    const response = await axios.get(`${endpoint}/users/getAllStudents`);
                     setStudents(response.data); 
                   
                 } catch (error) {

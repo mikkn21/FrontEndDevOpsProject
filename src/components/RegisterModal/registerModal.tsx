@@ -5,6 +5,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import HashPass from "../HashPass/passwordHash";
 import { loginResponse } from "../../pages/login/login";
+import { config } from "../../config";
 
 interface RegisterModalProps {
   onClose: () => void;
@@ -19,15 +20,15 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ onClose }) => {
   const handleRegistration = async () => {
     setError("");
     
-    const endpoint = "/api/ENDPOINT"; // Adjust URL to your actual API endpoint
+    const endpoint = `${config.VITE_BACKEND_URL}`;
 
     // Get the hashed password to send to the backend
     const hashedPassword = await HashPass(password);
 
     try {
-      const response = await axios.post(`${endpoint}/register`, {
-        username,
-        hashedPassword,
+      const response = await axios.post(`${endpoint}/users/addUser`, {
+        "name":username,
+        "password":hashedPassword,
       });
 
       if (response.status === 200 && response.data.token) {

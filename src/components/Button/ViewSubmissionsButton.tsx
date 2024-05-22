@@ -3,6 +3,7 @@ import axios from 'axios';
 import Button from './Button';
 import { Submission } from '../../utils/types';
 import SubmissionsModal from '../SubmissionModal/SubmissionsModal';
+import { config } from '../../config';
 
 interface ViewSubmissionsButtonProps {
   AssignmentId: number
@@ -36,7 +37,7 @@ const ViewSubmissionsButton: React.FC<ViewSubmissionsButtonProps> = ({ Assignmen
         } else {
             try {   
                 // TODO: have an api endpoint that fetches all submissions for a given assignment
-                const endpoint = `/api/EVALUATION_SERVICE_ENDPOINT/${AssignmentId}`;
+                const endpoint = `${config.VITE_BACKEND_URL}/solution/solutions_by_assignment_id/${AssignmentId}`;
                 const response = await axios.get<Submission[]>(endpoint);
                 setSubmissions(response.data); 
                 setLoading(false);

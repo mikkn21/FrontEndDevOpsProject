@@ -6,6 +6,7 @@ import axios from "axios";
 import FileUploadButton from '../Button/FileUploadButton';
 import fileIcon from '../../assets/icons8-file.svg'
 import { Assignment, Person, Role, Status } from '../../utils/types';
+import { config } from '../../config';
 
 interface InputModalProps {
     assignment: Assignment;
@@ -27,10 +28,11 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
     const [visible, setVisible] = useState(true); // Default to true
     const [maxTime, setMaxTime] = useState(0); // Default to 0
     const [maxMem, setmaxMem] = useState(0); // Default to 0
+    const [isPaused, setIsPaused] = useState(false); // Default to 0
     const [vCpu, setVCpu] = useState(0); // Default to 0
     const [maxSubmissions, setMaxSubmissions] = useState(2); // Default to 2
 
-    const endpoint = `/api/ENDPOINT`; // Adjust URL to your actual API endpoint
+    const endpoint = `${config.VITE_BACKEND_URL}/`;
 
 
     // Update the state when the assignment prop changes
@@ -44,6 +46,7 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
         setMaxSubmissions(assignment.maxSubmissions);
         setSelectedStudents(assignment.selectedStudents || []);
         setFile(assignment.file || null);
+        setIsPaused(assignment.isPaused);
     }, [assignment]);
 
 
@@ -55,7 +58,8 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
                 name,
                 dueDate,
                 selectedStudents,
-                visible, 
+                visible,
+                isPaused, 
                 maxTime,  
                 maxMem, 
                 vCpu, 
@@ -69,21 +73,32 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
             setLoading(true);
             const formData = new FormData();
             // Only the configurable fields are sent
-            formData.append('name', name);
-            formData.append('selectedStudents', JSON.stringify(selectedStudents.map(student => student.id)));
-            formData.append('dueDate', dueDate.toISOString().split('T')[0]);
-            formData.append('isPaused', String(visible));
-            formData.append('maxTime', String(maxTime));
-            formData.append('maxMem', String(maxMem));
-            formData.append('vCpu', String(vCpu));
-            formData.append('maxSubmissions', String(maxSubmissions));
+            formData.append('title', name);
+            formData.append('students', JSON.stringify(selectedStudents.map(student => student.id)));
+            formData.append('deadline', dueDate.toISOString().split('T')[0]);
+            formData.append('ispaused', String(isPaused));
+            formData.append('visibility', String(visible));
+            formData.append('maxtime', String(maxTime));
+            formData.append('maxmem', String(maxMem));
+            formData.append('vcpu', String(vCpu));
+            formData.append('attempts', String(maxSubmissions));
           
             if (file) formData.append('file', file);
-                
+            
             // assuming the backend send the updated assignment back
-            const response = await axios.put(`${endpoint}/${assignment.id}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
+            const response = await axios.put(`${endpoint}/${assignment.id}`, formData);
+            //     "title":name,
+            //     "students":JSON.stringify(selectedStudents.map(student => student.id)),
+            //     "deadline":dueDate.toISOString().split('T')[0],
+            //     "ispaused":String(isPaused),
+            //     "maxmemory":String(maxMem),
+            //     "maxtime":String(maxMem),
+            //     "vcpu":String(vCpu),
+            //     "attempts":String(maxSubmissions),
+            //     "visibility":String(visible),
+            //     "file"
+            // });
+
             onSave(response.data);
             onClose();
             } catch (error) {
@@ -138,7 +153,7 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
             const fetchStudents = async () => {
                 setLoading(true);
                 try {
-                    const response = await axios.get(endpoint);
+                    const response = await axios.get(`${endpoint}/users/getAllStudents`);
                     setStudents(response.data); 
                 
                 } catch (error) {

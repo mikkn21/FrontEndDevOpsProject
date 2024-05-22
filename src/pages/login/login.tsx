@@ -91,8 +91,9 @@ const LoginPage: React.FC = () => {
           // Expires in should be reduced to the number of days? Which is fucked as we want to specify something like seconds.
           // can just be converted to 0.xx days?
           const initialLogin = loginResponse;
+          const tokenValue = `${"authToken"}|${username}|${response.data.role}|${response.data.id}`;
           Object.assign(loginResponse, {
-            token: response.data.token,
+            token: tokenValue,
             expires_in: response.data.expires_in,
           });
 
