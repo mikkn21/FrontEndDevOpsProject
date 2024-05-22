@@ -98,7 +98,7 @@ jobs:
       - name: Deploy to gke
         run: |
           gcloud container clusters get-credentials devops --region=europe-west2
-          kubectl set image deployment/frontend frontend=${{ env.GOOGLE_REGISTRY }}/devops-422910/${{ env.IMAGE_NAME }}:${{ needs.version-and-tag }} -n frontend
+          kubectl set image deployment/frontend frontend=${{ env.GOOGLE_REGISTRY }}/devops-422910/devops/${{ env.IMAGE_NAME }}:${{ needs.version-and-tag.outputs.tag }} -n frontend
 
       - name: Push docker image to GHCR
         uses: docker/build-push-action@v3
