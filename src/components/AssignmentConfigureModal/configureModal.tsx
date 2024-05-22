@@ -28,7 +28,7 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
     const [visible, setVisible] = useState(true); // Default to true
     const [maxTime, setMaxTime] = useState(0); // Default to 0
     const [maxMem, setmaxMem] = useState(0); // Default to 0
-    const [isPaused, setIsPaused] = useState(false); // Default to 0
+    const [isPaused, setIsPaused] = useState<boolean|undefined>(false); // Default to false
     const [vCpu, setVCpu] = useState(0); // Default to 0
     const [maxSubmissions, setMaxSubmissions] = useState(2); // Default to 2
 
@@ -46,7 +46,7 @@ const ConfigureModal: React.FC<InputModalProps> = ({assignment, isOpen, onClose,
         setMaxSubmissions(assignment.maxSubmissions);
         setSelectedStudents(assignment.selectedStudents || []);
         setFile(assignment.file || null);
-        setIsPaused(assignment.isPaused);
+        setIsPaused(assignment.isPaused == undefined ? false : assignment.isPaused);
     }, [assignment]);
 
 
