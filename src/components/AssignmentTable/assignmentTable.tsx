@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./assignmentTable.css";
 import AssignmentCell from "../AssignmentCell/assignmentCell";
-import { getCookie, getCookieRole, getCookieId } from "../../utils/cookieUtils";
+import { getCookieRole, getCookieId } from "../../utils/cookieUtils";
 import Button from "../Button/Button";
 import AssignmentAddModal from "../AssignmentAddModal/assignmentAddModal";
 import { Assignment } from "../../utils/types";
@@ -200,7 +200,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
       setAssignments(filteredAssignments);
       setLoading(false);
     } else {
-      const userId = getCookie();
+      const userId = getCookieId();
       if (!userId) {
         setError({ message: "No user ID found in cookie" });
         setLoading(false);
@@ -211,7 +211,7 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
       axios
         .get(
           role === "student"
-            ? `${baseEndpoint}/assignment/getUserAssignments//${userId}`
+            ? `${baseEndpoint}/assignment/getUserAssignments/${userId}`
             : `${baseEndpoint}/assignment/getTeacherAssignment/${userId}`,
           {
             headers: {
