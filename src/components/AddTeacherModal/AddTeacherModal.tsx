@@ -79,7 +79,22 @@ const AddTeacherModal: React.FC<AddTeacherModalProps> = ({
           onRequestClose();
         }
       } catch (error) {
-        setError({ message: "An error occurred. Please try again later." });
+        if (axios.isAxiosError(error)) {
+          if (error.response) {
+            if (
+              error.response.status === 400 &&
+              error.response.data.error === "User already exists"
+            ) {
+              setError({
+                message:
+                  "Username already exists. Please choose a different one.",
+              });
+              return;
+            }
+          }
+        } else {
+          setError({ message: "An error occurred. Please try again later." });
+        }
       }
     }
   };
