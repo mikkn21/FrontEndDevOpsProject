@@ -13,6 +13,25 @@ type AdminProps = {
   testMode?: boolean;
 };
 
+type BackendPerson = {
+  userId: string;
+  name: string;
+  password: string;
+  role: Role;
+  timestamp: string;
+};
+
+function convertBackendPerson(persons: BackendPerson[]): Person[] {
+  return persons.map((person) => {
+    return {
+      id: person.userId,
+      name: person.name,
+      role: person.role,
+      status: Status.ACTIVE,
+    };
+  });
+}
+
 const Admin: React.FC<AdminProps> = ({ testMode = false }) => {
   const [students, setStudents] = useState<Person[]>([]);
   const [teachers, setTeachers] = useState<Person[]>([]);
@@ -79,7 +98,8 @@ const Admin: React.FC<AdminProps> = ({ testMode = false }) => {
           });
           console.log("response.data : ", response.data);
           console.log("response:", response);
-          setTeachers(response.data);
+          const updatedTeachers = convertBackendPerson(response.data);
+          setTeachers(updatedTeachers);
           if (response.data.length === 0) {
             addError("No teachers found");
           }
