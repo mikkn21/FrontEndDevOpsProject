@@ -45,6 +45,8 @@ const Admin: React.FC<AdminProps> = ({ testMode = false }) => {
       setLoading(false); // End loading
     } else {
       console.log("Fetching students and teachers");
+      console.log("ENDPOINT for fetching teacher and user: ", endpoint);
+      console.log("backend url", config.VITE_BACKEND_URL);
       const fetchStudents = async () => {
         try {
           const studentEndpoint = `${endpoint}/users/getAllStudents`;
@@ -55,7 +57,10 @@ const Admin: React.FC<AdminProps> = ({ testMode = false }) => {
               Authentication: loginResponse.token.split("|")[0],
             },
           });
-          setStudents(response.data.data);
+          setStudents(response.data);
+          if (response.data.length === 0) {
+            addError("No students found");
+          }
         } catch (err) {
           console.error(err);
           addError("Failed to fetch students");
@@ -72,8 +77,12 @@ const Admin: React.FC<AdminProps> = ({ testMode = false }) => {
               Authentication: loginResponse.token.split("|")[0],
             },
           });
-          console.log("response.data : ", response.data.data);
-          setTeachers(response.data.data);
+          console.log("response.data : ", response.data);
+          console.log("response:", response);
+          setTeachers(response.data);
+          if (response.data.length === 0) {
+            addError("No teachers found");
+          }
         } catch (err) {
           console.error(err);
           addError("Failed to fetch teachers");
