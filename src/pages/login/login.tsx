@@ -12,12 +12,14 @@ type LoginResponse = {
   token: string;
   expires_in: number;
   initialised: boolean;
+  intervalId: NodeJS.Timeout | null;
 };
 
 const loginResponse: LoginResponse = {
   token: "",
   expires_in: 0,
   initialised: false,
+  intervalId: null,
 };
 
 const LoginPage: React.FC = () => {
@@ -127,7 +129,10 @@ const LoginPage: React.FC = () => {
       }
     };
     const exp = await refreshToken();
-    setInterval(refreshToken, exp);
+    if (exp && !loginResponse.intervalId) {
+      const id = setInterval(refreshToken, exp);
+      loginResponse.intervalId = id;
+    }
   };
 
   return (

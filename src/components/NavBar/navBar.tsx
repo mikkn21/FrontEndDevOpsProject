@@ -15,6 +15,9 @@ const Navbar: React.FC = () => {
   const handleLogout = () => {
     loginResponse.expires_in = 0;
     loginResponse.token = "";
+    loginResponse.initialised = false;
+    clearInterval(loginResponse.intervalId!!);
+    loginResponse.intervalId = null;
     navigate("/login"); // Assuming you have a login route
   };
 
