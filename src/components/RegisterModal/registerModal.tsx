@@ -19,17 +19,26 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ onClose }) => {
 
   const handleRegistration = async () => {
     setError("");
-    
+
     const endpoint = `${config.VITE_BACKEND_URL}`;
 
     // Get the hashed password to send to the backend
     const hashedPassword = await HashPass(password);
 
     try {
-      const response = await axios.post(`${endpoint}/users/addUser`, {
-        "name":username,
-        "password":hashedPassword,
-      });
+      const response = await axios.post(
+        `${endpoint}/users/addUser`,
+        {
+          name: username,
+          password: hashedPassword,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authentication: loginResponse.token.split("|")[0],
+          },
+        }
+      );
       console.log("Response : ", response);
       if (response.status === 201 && response.data.token) {
         // Expires in should be reduced to the number of days? Which is fucked as we want to specify something like seconds.
