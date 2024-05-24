@@ -234,7 +234,15 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
         })
         .catch((error) => {
           console.error("Error fetching assignments", error);
-          setError({ message: error.message || "Error fetching assignments" });
+          if (error.response) {
+            if (error.response.status === 404) {
+              setError({ message: "No assignments found" });
+            }
+          } else {
+            setError({
+              message: error.message || "Error fetching assignments",
+            });
+          }
           setLoading(false);
         });
     }
