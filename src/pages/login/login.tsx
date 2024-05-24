@@ -74,33 +74,31 @@ const LoginPage: React.FC = () => {
       return;
     }
 
-
     const endpoint = `${config.VITE_BACKEND_URL}/users/login`;
 
     // Get the hashed password to send to the backend
     const hashedPassword = await HashPass(password);
 
-    const refreshToken = async () => {
+    const refreshToken = async (): Promise<number | undefined> => {
       try {
         console.log("BACKENDURL : ", endpoint);
         const response = await axios.post(endpoint, {
-          'name': username,
-          'password': hashedPassword,
+          name: username,
+          password: hashedPassword,
         });
         console.log("Response : ", response);
         if (response.status === 200 && response.data.token) {
-          // Expires in should be reduced to the number of days? Which is fucked as we want to specify something like seconds.
-          // can just be converted to 0.xx days?
           const initialLogin = loginResponse;
-          const tokenValue = `${"authToken"}|${username}|${response.data.role}|${response.data.id}`;
+          const tokenValue = `${response.data.token}|${username}|${response.data.role}|${response.data.id}`;
           Object.assign(loginResponse, {
             token: tokenValue,
-            expires_in: response.data.expires_in,
+            expires_in: response.data.exp * 1000,
           });
 
           // if was not logged in at first, navigate the user
-          if (initialLogin.token === "") {
+          if (initialLogin.token == "") {
             navigate("/");
+            return response.data.exp * 1000;
           }
         }
       } catch (error) {
@@ -121,8 +119,8 @@ const LoginPage: React.FC = () => {
         }
       }
     };
-    refreshToken();
-    setInterval(refreshToken, 1000 * 60); // 10 minutes
+    const expiry = await refreshToken();
+    setInterval(refreshToken, expiry); // 10 minutes
   };
 
   return (
