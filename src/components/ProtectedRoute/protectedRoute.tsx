@@ -12,7 +12,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requireAdmin,
   element,
 }) => {
-  const isAuthenticated = loginResponse.token !== "";
+  const isAuthenticated = loginResponse.token != "";
   const role = getCookieRole();
 
   if (requireAdmin && isAuthenticated && role != "admin") {

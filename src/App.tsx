@@ -4,11 +4,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LoginPage } from "./pages/login/login";
 import Admin from "./pages/admin/admin";
 import Home from "./pages/home/home";
-import { loadConfig, config } from "./config";
+import { loadConfig } from "./config";
 
 const App: React.FC = () => {
-  loadConfig();
-  console.log("config", config);
+  loadConfig().then((config) => {
+    console.log("config", config);
+  });
   useEffect(() => {
     document.title = "Better Learning";
   }, []);
@@ -24,7 +25,12 @@ const App: React.FC = () => {
         />
         <Route
           path="/admin"
-          element={<ProtectedRoute requireAdmin={true} element={<Admin testMode={false} />} />}
+          element={
+            <ProtectedRoute
+              requireAdmin={true}
+              element={<Admin testMode={false} />}
+            />
+          }
         />
       </Routes>
     </BrowserRouter>

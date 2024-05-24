@@ -11,11 +11,13 @@ import { config } from "../../config";
 type LoginResponse = {
   token: string;
   expires_in: number;
+  initialised: boolean;
 };
 
 const loginResponse: LoginResponse = {
   token: "",
   expires_in: 0,
+  initialised: false,
 };
 
 const LoginPage: React.FC = () => {
@@ -74,6 +76,7 @@ const LoginPage: React.FC = () => {
       return;
     }
 
+    console.log(config);
     const endpoint = `${config.VITE_BACKEND_URL}/users/login`;
 
     // Get the hashed password to send to the backend
@@ -88,15 +91,19 @@ const LoginPage: React.FC = () => {
         });
         console.log("Response : ", response);
         if (response.status === 200 && response.data.token) {
-          const initialLogin = loginResponse;
+          const initialLogin = !loginResponse.initialised;
           const tokenValue = `${response.data.token}|${username}|${response.data.role}|${response.data.id}`;
           Object.assign(loginResponse, {
             token: tokenValue,
             expires_in: response.data.exp * 1000,
+            initialised: true,
           });
 
+          console.log("loginResponse : ", loginResponse);
+          console.log("initialLogin : ", initialLogin);
+          console.log("is initial login token empty : ", initialLogin);
           // if was not logged in at first, navigate the user
-          if (initialLogin.token == "") {
+          if (initialLogin) {
             navigate("/");
             return response.data.exp * 1000;
           }
@@ -119,8 +126,8 @@ const LoginPage: React.FC = () => {
         }
       }
     };
-    const expiry = await refreshToken();
-    setInterval(refreshToken, expiry); // 10 minutes
+    const exp = await refreshToken();
+    setInterval(refreshToken, exp);
   };
 
   return (
