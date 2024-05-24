@@ -31,7 +31,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ onClose }) => {
         "password":hashedPassword,
       });
       console.log("Response : ", response);
-      if (response.status === 200 && response.data.token) {
+      if (response.status === 201 && response.data.token) {
         // Expires in should be reduced to the number of days? Which is fucked as we want to specify something like seconds.
         // can just be converted to 0.xx days?
         loginResponse.expires_in = response.data.expires_in;
@@ -39,7 +39,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ onClose }) => {
 
         // Close the modal upon successful registration
         onClose();
-        navigate("/");
+        navigate("/login");
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
