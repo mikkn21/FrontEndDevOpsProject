@@ -24,7 +24,7 @@ const Admin: React.FC<AdminProps> = ({ testMode = false }) => {
 
   const itemsPerPage = 2;
 
-  const endpoint = `${config.VITE_BACKEND_URL}/users/login`;
+  const endpoint = `${config.VITE_BACKEND_URL}`;
 
   const addError = (newError: string) => {
     setErrors([newError]);
@@ -48,13 +48,14 @@ const Admin: React.FC<AdminProps> = ({ testMode = false }) => {
       const fetchStudents = async () => {
         try {
           const studentEndpoint = `${endpoint}/users/getAllStudents`;
-          const response = await axios.get<Person[]>(studentEndpoint, {
+          console.log("TOKEN : ", loginResponse.token.split("|")[0]);
+          const response = await axios.get(studentEndpoint, {
             headers: {
               "Content-Type": "application/json",
               Authentication: loginResponse.token.split("|")[0],
             },
           });
-          setStudents(response.data);
+          setStudents(response.data.data);
         } catch (err) {
           console.error(err);
           addError("Failed to fetch students");
@@ -64,13 +65,15 @@ const Admin: React.FC<AdminProps> = ({ testMode = false }) => {
       const fetchTeachers = async () => {
         try {
           const teacherEndpoint = `${endpoint}/users/getAllTeachers`;
-          const response = await axios.get<Person[]>(teacherEndpoint, {
+          console.log("TEACHER ENDPOINT : ", teacherEndpoint);
+          const response = await axios.get(teacherEndpoint, {
             headers: {
               "Content-Type": "application/json",
               Authentication: loginResponse.token.split("|")[0],
             },
           });
-          setTeachers(response.data);
+          console.log("response.data : ", response.data.data);
+          setTeachers(response.data.data);
         } catch (err) {
           console.error(err);
           addError("Failed to fetch teachers");

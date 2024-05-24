@@ -63,7 +63,7 @@ const AddTeacherModal: React.FC<AddTeacherModalProps> = ({
           {
             name: username,
             password: hashedPassword,
-            role: 0,
+            role: Role.TEACHER,
           },
           {
             headers: {
