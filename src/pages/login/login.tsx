@@ -142,7 +142,7 @@ const LoginPage: React.FC = () => {
         <RegisterModal onClose={handleHideRegisterModal} />
       ) : (
         <div className="login-box">
-          <h1>Welcome to Better Learning</h1>
+          <h1>Welcome to Better Learning, this is a new version!</h1>
           <div className="login-form">
             <input
               type="text"
