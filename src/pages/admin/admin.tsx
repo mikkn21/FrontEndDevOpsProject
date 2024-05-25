@@ -298,7 +298,7 @@ const Admin: React.FC<AdminProps> = ({ testMode = false }) => {
       </div>
       <AddTeacherModal
         isOpen={isModalOpen}
-        testMode={false}
+        testMode={true}
         onRequestClose={closeModal}
         onAddTeacher={handleAddTeacher}
       />

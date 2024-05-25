@@ -10,7 +10,7 @@ const home: React.FC = () => {
         <div>
         <Navbar />
         <div className = 'container'>
-              <AssignmentTable testMode={false} />
+              <AssignmentTable testMode={true} />
         </div>
       </div>
     );

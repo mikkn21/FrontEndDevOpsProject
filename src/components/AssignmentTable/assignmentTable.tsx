@@ -361,9 +361,9 @@ const AssignmentTable: React.FC<AssignmentTableProps> = ({
       {showModal && (
         <AssignmentAddModal
           isOpen={showModal}
-          onClose={() => setShowModal(false)}
+          onClose={() => setShowModal(true)}
           onSave={handleCreateAssignment}
-          testMode={false}
+          testMode={true}
           teacherId={getCookieId() || undefined} // if no teacherId, pass undefined to use the default value
         />
       )}

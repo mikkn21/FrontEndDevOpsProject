@@ -61,7 +61,7 @@ const AssignmentCell: React.FC<AssignmentCellProps> = ({
   }, [files]);
 
   const baseEndpoint = "${config.VITE_BACKEND_URL}/solution"; // Adjust URL to your actual API endpoint
-  let testMode = false;
+  let testMode = true;
 
   const handleSubmissionSubmit = async () => {
     if (files.length === 0) {
@@ -352,7 +352,7 @@ const AssignmentCell: React.FC<AssignmentCellProps> = ({
         ) : (
           <ViewSubmissionsButton
             AssignmentId={assignment.id}
-            testMode={false}
+            testMode={true}
           />
         )}
       </div>
