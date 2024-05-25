@@ -21,13 +21,12 @@ const App: React.FC = () => {
 
         <Route
           path="/"
-          element={<ProtectedRoute requireAdmin={true} element={<Home />} />}
+          element={<ProtectedRoute element={<Home />} />}
         />
         <Route
           path="/admin"
           element={
             <ProtectedRoute
-              requireAdmin={true}
               element={<Admin testMode={true} />}
             />
           }
