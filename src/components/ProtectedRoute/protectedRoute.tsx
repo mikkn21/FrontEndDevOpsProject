@@ -1,6 +1,5 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-import { getCookieRole } from "../../utils/cookieUtils";
 import { loginResponse } from "../../pages/login/login";
 
 interface ProtectedRouteProps {
