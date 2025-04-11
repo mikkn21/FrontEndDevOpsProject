@@ -33,6 +33,10 @@ Here's a brief video demonstration of the frontend UI and functionality (running
 ➡️ **[Watch Frontend Showcase Video](./assets/demoFrontend.mp4)** ⬅️
 
 
+## Diagram of the Infrastructure
+Here is a diagram of the entire application's infrastructure:
+![Infrastructure diagram](./assets/devops.drawio.svg)
+
 ## My Contributions to the Original Project
 
 While working in a group of six people, my primary responsibilities and contributions included:
