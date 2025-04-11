@@ -32,6 +32,7 @@ Here are some short animated demonstrations of different user perspectives and f
 
 ### Teacher Perspective
 Illustrates a teacher creating a new assignment, configuring settings (like deadlines, visibility, resource limits), and uploading the required Docker tester image file.
+
 ![Teacher Demo](./assets/demoTeacher.gif)
 
 ### Student Perspective
@@ -40,10 +41,12 @@ Demonstrates the student view: browsing current and past assignments, uploading 
 
 ### Administrator Perspective
 Shows the Admin dashboard: viewing all users (students/teachers) filtered by status (paused/active). Demonstrates adding, pausing, and deleting teachers, including handling of potential error messages.
+
 ![Admin Demo](./assets/demoAdmin.gif)
 
 ### Login Flow (Example)
 Shows accessing the frontend via HTTPS at betterlearning.systems (hosted on Google Cloud using GKE Ingress), the enforced login requirement, the new user registration process (with error handling), and a successful login sequence.
+
 ![Cloud Login Demo](./assets/demoCloudLogin.gif)
 
 ---
