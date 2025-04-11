@@ -26,11 +26,31 @@ The goal of the original project was to build a distributed system using microse
 
 This repository serves as a public showcase specifically for the **frontend application** I developed for the project. It demonstrates the user interface, user experience flows, and frontend logic built to interact with the intended backend microservices.
 
-## Frontend Showcase Video
+## Frontend Showcase Demos
 
-Here's a brief video demonstration of the frontend UI and functionality (running with mock data):
+Here are some short animated demonstrations of different user perspectives and functionalities within the frontend application (running with mock data):
 
-➡️ **[Watch Frontend Showcase Video](./assets/demoFrontend.mp4)** ⬅️
+### Teacher Perspective
+Illustrates a teacher creating a new assignment, configuring settings (like deadlines, visibility, resource limits), and uploading the required Docker tester image file.
+![Teacher Demo](./assets/demoTeacher.gif)
+
+### Student Perspective
+Demonstrates the student view: browsing current and past assignments, uploading multiple solution files for one assignment, receiving confirmation on successful upload, and showing the UI response when the maximum submission limit is met.
+![Student Demo](./assets/demoStudent.gif)
+
+### Administrator Perspective
+Shows the Admin dashboard: viewing all users (students/teachers) filtered by status (paused/active). Demonstrates adding, pausing, and deleting teachers, including handling of potential error messages.
+![Admin Demo](./assets/demoAdmin.gif)
+
+### Login Flow (Example)
+Shows accessing the frontend via HTTPS at betterlearning.systems (hosted on Google Cloud using GKE Ingress), the enforced login requirement, the new user registration process (with error handling), and a successful login sequence.
+![Cloud Login Demo](./assets/demoCloudLogin.gif)
+
+---
+
+**For a complete walkthrough, you can watch the full video demonstration:**
+
+➡️ **[Watch the Full Frontend Demo Video](./assets/demoFrontend.mp4)** ⬅️
 
 
 ## Diagram of the Infrastructure
