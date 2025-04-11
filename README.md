@@ -6,7 +6,7 @@ This repository contains the frontend code developed for the "Distributed Testin
 
 ## Original Project Overview
 
-The goal of the original project was to build a distributed system allowing teachers to set up programming assignments, students to submit solutions, and the system to automatically test these solutions within isolated Docker containers.
+The goal of the original project was to build a distributed system using microservices and DevOps practices (like setting up a CI/CD pipeline), allowing teachers to set up programming assignments, students to submit solutions, and the system to automatically test these solutions within isolated Docker containers.
 
 **Key system requirements included:**
 
