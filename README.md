@@ -37,6 +37,7 @@ Illustrates a teacher creating a new assignment, configuring settings (like dead
 
 ### Student Perspective
 Demonstrates the student view: browsing current and past assignments, uploading multiple solution files for one assignment, receiving confirmation on successful upload, and showing the UI response when the maximum submission limit is met.
+
 ![Student Demo](./assets/demoStudent.gif)
 
 ### Administrator Perspective
